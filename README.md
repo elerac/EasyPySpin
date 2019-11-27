@@ -3,14 +3,14 @@
 EasyPySpin is a wrapper for FLIR [Spinnaker SDK](https://www.flir.com/products/spinnaker-sdk/). This wrapper provides much the same way as the OpenCV VideoCapture class.
 
 
-# Usage
-## Live streaming
+## Usage
+### Live streaming
 Live streaming will start when `EasyPySpin.py` is executed.
 ```
 python3 EasyPySpin.py
 ```
 
-## Use as module
+### Use as module
 `EasyPySpin.py` can be used as a module.
 ```python
 import cv2
