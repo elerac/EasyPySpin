@@ -154,8 +154,8 @@ def main():
         print("cap cant open\nexit")
         return -1
 
-    cap.set(cv2.CAP_PROP_EXPOSURE, -1)
-    cap.set(cv2.CAP_PROP_GAIN, -1)
+    cap.set(cv2.CAP_PROP_EXPOSURE, -1) #-1 sets exposure_time to auto
+    cap.set(cv2.CAP_PROP_GAIN, -1) #-1 sets gain to auto
     cap.set(cv2.CAP_PROP_GAMMA, 1)
    
     while True:
