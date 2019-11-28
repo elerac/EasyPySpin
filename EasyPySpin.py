@@ -18,10 +18,26 @@ class VideoCapture:
         handling_mode_entry = handling_mode.GetEntryByName('NewestOnly')
         handling_mode.SetIntValue(handling_mode_entry.GetValue())
         
+        node_trigger_mode = PySpin.CEnumerationPtr(self.nodemap.GetNode('TriggerMode'))
+        node_trigger_mode_off = node_trigger_mode.GetEntryByName('Off')
+        node_trigger_mode.SetIntValue(node_trigger_mode_off.GetValue())
+
+        node_trigger_source = PySpin.CEnumerationPtr(self.nodemap.GetNode('TriggerSource'))
+        node_trigger_source_software = node_trigger_source.GetEntryByName('Software')
+        node_trigger_source.SetIntValue(node_trigger_source_software.GetValue())
+        
+        node_trigger_mode_on = node_trigger_mode.GetEntryByName('On')
+        node_trigger_mode.SetIntValue(node_trigger_mode_on.GetValue())
+        
         self.cam.BeginAcquisition()
 
     def release(self):
         self.cam.EndAcquisition()
+        
+        node_trigger_mode = PySpin.CEnumerationPtr(self.nodemap.GetNode('TriggerMode'))
+        node_trigger_mode_off = node_trigger_mode.GetEntryByName('Off')
+        node_trigger_mode.SetIntValue(node_trigger_mode_off.GetValue())
+        
         self.cam.DeInit()
         del self.cam
         self.cam_list.Clear()
@@ -34,6 +50,9 @@ class VideoCapture:
             return False
 
     def read(self):
+        node_softwaretrigger_cmd = PySpin.CCommandPtr(self.nodemap.GetNode('TriggerSoftware'))
+        node_softwaretrigger_cmd.Execute()
+        
         image = self.cam.GetNextImage()
         if image.IsIncomplete():
             return False, None
