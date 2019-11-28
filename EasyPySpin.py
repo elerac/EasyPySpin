@@ -39,6 +39,7 @@ class VideoCapture:
             return False, None
 
         img_NDArray = image.GetNDArray()
+        image.Release()
         return True, img_NDArray
     
     def set(self, propId, value):
