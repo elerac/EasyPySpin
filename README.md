@@ -22,8 +22,8 @@ if not cap.isOpened():
     print("cap cant open\nexit")
     return -1
 
-cap.set(cv2.CAP_PROP_EXPOSURE, 100000)
-cap.set(cv2.CAP_PROP_GAIN, 10)
+cap.set(cv2.CAP_PROP_EXPOSURE, 100000) #us
+cap.set(cv2.CAP_PROP_GAIN, 10) #dB
 
 ret, frame = cap.read()
 
