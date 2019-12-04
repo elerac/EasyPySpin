@@ -10,7 +10,7 @@ Live streaming will start when `EasyPySpin.py` is executed.
 python3 EasyPySpin.py
 ```
 
-### Use as module
+### Use as a module
 `EasyPySpin.py` can be used as a module.
 ```python
 import cv2
