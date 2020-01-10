@@ -68,6 +68,10 @@ class VideoCapture:
         if propId==cv2.CAP_PROP_GAMMA:
             return self._set_Gamma(value)
 
+        #FrameRate setting
+        if propId==cv2.CAP_PROP_FPS:
+            return self._set_FrameRate(value)
+
         return False
     
     def get(self, propId):
@@ -85,6 +89,9 @@ class VideoCapture:
 
         if propId==cv2.CAP_PROP_FRAME_HEIGHT:
             return self._get_Height()
+
+        if propId==cv2.CAP_PROP_FPS:
+            return self._get_FrameRate()
 
         return False
     
@@ -117,6 +124,13 @@ class VideoCapture:
         self.cam.Gamma.SetValue(gamma_to_set)
         return True
 
+    def _set_FrameRate(self, value):
+        if not type(value) in (int, float): return False
+        self.cam.AcquisitionFrameRateEnable.SetValue(True)
+        fps_to_set = self.__clip(value, self.cam.AcquisitionFrameRate.GetMin(), self.cam.AcquisitionFrameRate.GetMax())
+        self.cam.AcquisitionFrameRate.SetValue(fps_to_set)
+        return True
+
     def _get_ExposureTime(self):
         return self.cam.ExposureTime.GetValue()
 
@@ -132,6 +146,9 @@ class VideoCapture:
     def _get_Height(self):
         return self.cam.Height.GetValue()
 
+    def _get_FrameRate(self):
+        return self.cam.AcquisitionFrameRate.GetValue()
+
 def main():
     cap = VideoCapture(0)
 
@@ -142,6 +159,7 @@ def main():
     cap.set(cv2.CAP_PROP_EXPOSURE, -1) #-1 sets exposure_time to auto
     cap.set(cv2.CAP_PROP_GAIN, -1) #-1 sets gain to auto
     cap.set(cv2.CAP_PROP_GAMMA, 1)
+    cap.set(cv2.CAP_PROP_FPS, 30)
 
 
     while True:
