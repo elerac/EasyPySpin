@@ -93,6 +93,9 @@ class VideoCapture:
         if propId==cv2.CAP_PROP_FPS:
             return self._get_FrameRate()
 
+        if propId==cv2.CAP_PROP_TEMPERATURE:
+            return self._get_Temperature()
+
         return False
     
     def __clip(self, a, a_min, a_max):
@@ -148,6 +151,9 @@ class VideoCapture:
 
     def _get_FrameRate(self):
         return self.cam.AcquisitionFrameRate.GetValue()
+
+    def _get_Temperature(self):
+        return self.cam.DeviceTemperature.GetValue()
 
 def main():
     cap = VideoCapture(0)
