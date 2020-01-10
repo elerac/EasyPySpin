@@ -2,6 +2,9 @@
 
 EasyPySpin is an unofficial wrapper for FLIR [Spinnaker SDK](https://www.flir.com/products/spinnaker-sdk/). This wrapper provides much the same way as the OpenCV VideoCapture class.
 
+## Requirement
+* [PySpin](https://www.flir.com/support-center/iis/machine-vision/downloads/spinnaker-sdk-and-firmware-download/)
+* OpenCV
 
 ## Usage
 ### Live streaming
