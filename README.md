@@ -36,6 +36,7 @@ cap.release()
 * `cv2.CAP_PROP_GAIN`
 * `cv2.CAP_PROP_GAMMA`
 * `cv2.CAP_PROP_FPS`
+* `cv2.CAP_PROP_BRIGHTNESS` 
 * `cv2.CAP_PROP_FRAME_WIDTH` (get only)
 * `cv2.CAP_PROP_FRAME_HEIGHT` (get only)
 * `cv2.CAP_PROP_TEMPERATURE` (get only)
