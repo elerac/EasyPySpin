@@ -220,6 +220,12 @@ def main():
         key = cv2.waitKey(30)
         if key==ord("q"):
             break
+        elif key==ord("c"):
+            import datetime
+            time_stamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            filepath = time_stamp + ".png"
+            cv2.imwrite(filepath, frame)
+            print("Export > ", filepath)
     
     cv2.destroyAllWindows()
     cap.release()
