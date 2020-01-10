@@ -10,7 +10,7 @@ EasyPySpin is an unofficial wrapper for FLIR [Spinnaker SDK](https://www.flir.co
 ### Live streaming
 Live streaming will start when `EasyPySpin.py` is executed.
 ```
-python3 EasyPySpin.py
+python EasyPySpin.py
 ```
 
 ### Use as a module
