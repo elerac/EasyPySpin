@@ -10,17 +10,16 @@ class VideoCapture:
         except: return None
         self.cam.Init()
         self.nodemap = self.cam.GetNodeMap()
-
+        
         s_node_map = self.cam.GetTLStreamNodeMap()
         handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
         handling_mode_entry = handling_mode.GetEntryByName('NewestOnly')
         handling_mode.SetIntValue(handling_mode_entry.GetValue())
-
-        self.cam.BeginAcquisition()
-
+        
     def __del__(self):
         try:
-            self.cam.EndAcquisition()
+            if self.cam.IsStreaming():
+                self.cam.EndAcquisition()
             self.cam.DeInit()
             del self.cam
             self.cam_list.Clear()
@@ -35,6 +34,9 @@ class VideoCapture:
         except: return False
 
     def read(self):
+        if not self.cam.IsStreaming():
+            self.cam.BeginAcquisition()
+
         image = self.cam.GetNextImage()
         if image.IsIncomplete():
             return False, None
