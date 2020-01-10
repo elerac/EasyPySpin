@@ -5,11 +5,9 @@ class VideoCapture:
     def __init__(self, index):
         self.system = PySpin.System.GetInstance()
         self.cam_list = self.system.GetCameras()
-        num_cam = self.cam_list.GetSize()
-        try:
-            self.cam = self.cam_list.GetByIndex(index)
-        except:
-            return None
+        #num_cam = self.cam_list.GetSize()
+        try: self.cam = self.cam_list.GetByIndex(index)
+        except: return None
         self.cam.Init()
         self.nodemap = self.cam.GetNodeMap()
 
@@ -17,155 +15,122 @@ class VideoCapture:
         handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
         handling_mode_entry = handling_mode.GetEntryByName('NewestOnly')
         handling_mode.SetIntValue(handling_mode_entry.GetValue())
-        
-        node_trigger_mode = PySpin.CEnumerationPtr(self.nodemap.GetNode('TriggerMode'))
-        node_trigger_mode_off = node_trigger_mode.GetEntryByName('Off')
-        node_trigger_mode.SetIntValue(node_trigger_mode_off.GetValue())
 
-        node_trigger_source = PySpin.CEnumerationPtr(self.nodemap.GetNode('TriggerSource'))
-        node_trigger_source_software = node_trigger_source.GetEntryByName('Software')
-        node_trigger_source.SetIntValue(node_trigger_source_software.GetValue())
-        
-        node_trigger_mode_on = node_trigger_mode.GetEntryByName('On')
-        node_trigger_mode.SetIntValue(node_trigger_mode_on.GetValue())
-        
         self.cam.BeginAcquisition()
 
+    def __del__(self):
+        try:
+            self.cam.EndAcquisition()
+            self.cam.DeInit()
+            del self.cam
+            self.cam_list.Clear()
+            self.system.ReleaseInstance()
+        except: pass
+
     def release(self):
-        self.cam.EndAcquisition()
-        
-        node_trigger_mode = PySpin.CEnumerationPtr(self.nodemap.GetNode('TriggerMode'))
-        node_trigger_mode_off = node_trigger_mode.GetEntryByName('Off')
-        node_trigger_mode.SetIntValue(node_trigger_mode_off.GetValue())
-        
-        self.cam.DeInit()
-        del self.cam
-        self.cam_list.Clear()
-        self.system.ReleaseInstance()
+        self.__del__()
 
     def isOpened(self):
-        try:
-            return self.cam.IsValid()
-        except:
-            return False
+        try: return self.cam.IsValid()
+        except: return False
 
     def read(self):
-        node_softwaretrigger_cmd = PySpin.CCommandPtr(self.nodemap.GetNode('TriggerSoftware'))
-        node_softwaretrigger_cmd.Execute()
-        
         image = self.cam.GetNextImage()
         if image.IsIncomplete():
             return False, None
-
+        
         img_NDArray = image.GetNDArray()
         image.Release()
         return True, img_NDArray
     
     def set(self, propId, value):
+        #Exposure setting
         if propId==cv2.CAP_PROP_EXPOSURE:
-            if value<0:
-                return self.Set_ExposureAuto(True)
+            #Auto
+            if value<0: return self._set_ExposureAuto(PySpin.ExposureAuto_Continuous)
 
-            ret = self.Set_ExposureAuto(False)
-            if ret==False:
-                return False
-            else:
-                return self.Set_ExposureTime(value)
-
+            #Manual
+            ret = self._set_ExposureAuto(PySpin.ExposureAuto_Off)
+            if ret==False: return False
+            return self._set_ExposureTime(value)
+        
+        #Gain setting
         if propId==cv2.CAP_PROP_GAIN:
-            if value<0:
-                return self.Set_GainAuto(True)
+            #Auto
+            if value<0: return self._set_GainAuto(PySpin.GainAuto_Continuous)
             
-            ret = self.Set_GainAuto(False)
-            if ret==False:
-                return False
-            else:
-                return self.Set_Gain(value)
-
+            #Manual
+            ret = self._set_GainAuto(PySpin.GainAuto_Off)
+            if ret==False: return False
+            return self._set_Gain(value)
+        
+        #Gamma setting
         if propId==cv2.CAP_PROP_GAMMA:
-            return self.Set_Gamma(value)
+            return self._set_Gamma(value)
 
         return False
     
     def get(self, propId):
         if propId==cv2.CAP_PROP_EXPOSURE:
-            return self.Get_ExposureTime()
+            return self._get_ExposureTime()
 
         if propId==cv2.CAP_PROP_GAIN:
-            return self.Get_Gain()
+            return self._get_Gain()
 
         if propId==cv2.CAP_PROP_GAMMA:
-            return self.Get_Gamma()
+            return self._get_Gamma()
+
+        if propId==cv2.CAP_PROP_FRAME_WIDTH:
+            return self._get_Width()
+
+        if propId==cv2.CAP_PROP_FRAME_HEIGHT:
+            return self._get_Height()
 
         return False
     
     def __clip(self, a, a_min, a_max):
         return min(max(a, a_min), a_max)
     
-    def Set_ExposureTime(self, value):
-        node_exposureTime = PySpin.CFloatPtr(self.nodemap.GetNode("ExposureTime"))
-        if PySpin.IsAvailable(node_exposureTime)==False or PySpin.IsWritable(node_exposureTime)==False: return False
+    def _set_ExposureTime(self, value):
         if not type(value) in (int, float): return False
-        exposureTime_to_set = self.__clip(value, node_exposureTime.GetMin(), node_exposureTime.GetMax())
-        node_exposureTime.SetValue(exposureTime_to_set)
+        exposureTime_to_set = self.__clip(value, self.cam.ExposureTime.GetMin(), self.cam.ExposureTime.GetMax())
+        self.cam.ExposureTime.SetValue(exposureTime_to_set)
         return True
 
-    def Set_ExposureAuto(self, value):
-        node_exposureAuto = PySpin.CEnumerationPtr(self.nodemap.GetNode("ExposureAuto"))
-        if PySpin.IsAvailable(node_exposureAuto)==False or PySpin.IsWritable(node_exposureAuto)==False: return False
-        if value==True:
-            exposureAuto_name = "Continuous"
-        elif value==False:
-            exposureAuto_name = "Off"
-        else:
-            exposureAuto_name = "Once"
-        exposureAuto = PySpin.CEnumEntryPtr(node_exposureAuto.GetEntryByName(exposureAuto_name)).GetValue()
-        node_exposureAuto.SetIntValue(exposureAuto)
+    def _set_ExposureAuto(self, value):
+        self.cam.ExposureAuto.SetValue(value)
         return True
 
-    def Set_Gain(self, value):
-        node_gain = PySpin.CFloatPtr(self.nodemap.GetNode("Gain"))
-        if PySpin.IsAvailable(node_gain)==False or PySpin.IsWritable(node_gain)==False: return False
+    def _set_Gain(self, value):
         if not type(value) in (int, float): return False
-        gain_to_set = self.__clip(value, node_gain.GetMin(), node_gain.GetMax())
-        node_gain.SetValue(gain_to_set)
+        gain_to_set = self.__clip(value, self.cam.Gain.GetMin(), self.cam.Gain.GetMax())
+        self.cam.Gain.SetValue(gain_to_set)
         return True
 
-    def Set_GainAuto(self, value):
-        node_gainAuto = PySpin.CEnumerationPtr(self.nodemap.GetNode("GainAuto"))
-        if PySpin.IsAvailable(node_gainAuto)==False or PySpin.IsWritable(node_gainAuto)==False: return False
-        if value==True:
-            gainAuto_name = "Continuous"
-        elif value==False:
-            gainAuto_name = "Off"
-        else:
-            gainAuto_name = "Once"
-        gainAuto = PySpin.CEnumEntryPtr(node_gainAuto.GetEntryByName(gainAuto_name)).GetValue()
-        node_gainAuto.SetIntValue(gainAuto)
+    def _set_GainAuto(self, value):
+        self.cam.GainAuto.SetValue(value)
         return True
 
-    def Set_Gamma(self, value):
-        node_gamma = PySpin.CFloatPtr(self.nodemap.GetNode("Gamma"))
-        if PySpin.IsAvailable(node_gamma)==False or PySpin.IsWritable(node_gamma)==False: return False
+    def _set_Gamma(self, value):
         if not type(value) in (int, float): return False
-        gamma_to_set = self.__clip(value, node_gamma.GetMin(), node_gamma.GetMax())
-        node_gamma.SetValue(gamma_to_set)
+        gamma_to_set = self.__clip(value, self.cam.Gamma.GetMin(), self.cam.Gamma.GetMax())
+        self.cam.Gamma.SetValue(gamma_to_set)
         return True
-    
-    def Get_ExposureTime(self):
-        node_exposureTime = PySpin.CFloatPtr(self.nodemap.GetNode("ExposureTime"))
-        if PySpin.IsAvailable(node_exposureTime)==False or PySpin.IsReadable(node_exposureTime)==False: return False
-        return node_exposureTime.GetValue()
 
-    def Get_Gain(self):
-        node_gain = PySpin.CFloatPtr(self.nodemap.GetNode("Gain"))
-        if PySpin.IsAvailable(node_gain)==False or PySpin.IsReadable(node_gain)==False: return False
-        return node_gain.GetValue()
+    def _get_ExposureTime(self):
+        return self.cam.ExposureTime.GetValue()
 
-    def Get_Gamma(self):
-        node_gamma = PySpin.CFloatPtr(self.nodemap.GetNode("Gamma"))
-        if PySpin.IsAvailable(node_gamma)==False or PySpin.IsReadable(node_gamma)==False: return False
-        return node_gamma.GetValue()
+    def _get_Gain(self):
+        return self.cam.Gain.GetValue()
+
+    def _get_Gamma(self):
+        return self.cam.Gamma.GetValue()
+
+    def _get_Width(self):
+        return self.cam.Width.GetValue()
+
+    def _get_Height(self):
+        return self.cam.Height.GetValue()
 
 def main():
     cap = VideoCapture(0)
@@ -177,17 +142,19 @@ def main():
     cap.set(cv2.CAP_PROP_EXPOSURE, -1) #-1 sets exposure_time to auto
     cap.set(cv2.CAP_PROP_GAIN, -1) #-1 sets gain to auto
     cap.set(cv2.CAP_PROP_GAMMA, 1)
-   
+
+
     while True:
         ret, frame = cap.read()
 
         exposureTime = cap.get(cv2.CAP_PROP_EXPOSURE)
         gain = cap.get(cv2.CAP_PROP_GAIN)
+        gamma = cap.get(cv2.CAP_PROP_GAMMA)
         print("exposureTime:", exposureTime)
         print("gain        :", gain)
         print("\033[2A",end="")
         
-        img_show = cv2.resize(frame, None, fx=0.5, fy=0.5)
+        img_show = cv2.resize(frame, None, fx=0.25, fy=0.25)
         cv2.imshow("capture", img_show)
         key = cv2.waitKey(30)
         if key==ord("q"):
@@ -198,3 +165,4 @@ def main():
 
 if __name__=="__main__":
     main()
+    
