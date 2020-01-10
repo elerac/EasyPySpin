@@ -72,6 +72,10 @@ class VideoCapture:
         if propId==cv2.CAP_PROP_FPS:
             return self._set_FrameRate(value)
 
+        #BackLigth setting
+        if propId==cv2.CAP_PROP_BACKLIGHT:
+            return self._set_BackLight(value)
+
         return False
     
     def get(self, propId):
@@ -95,6 +99,9 @@ class VideoCapture:
 
         if propId==cv2.CAP_PROP_TEMPERATURE:
             return self._get_Temperature()
+
+        if propId==cv2.CAP_PROP_BACKLIGHT:
+            return self._get_BackLight()
 
         return False
     
@@ -134,6 +141,13 @@ class VideoCapture:
         self.cam.AcquisitionFrameRate.SetValue(fps_to_set)
         return True
 
+    def _set_BackLight(self, value):
+        if value==True:backlight_to_set = PySpin.DeviceIndicatorMode_Active
+        elif value==False: backlight_to_set = PySpin.DeviceIndicatorMode_Inactive
+        else: return False
+        self.cam.DeviceIndicatorMode.SetValue(backlight_to_set)
+        return True
+
     def _get_ExposureTime(self):
         return self.cam.ExposureTime.GetValue()
 
@@ -154,6 +168,12 @@ class VideoCapture:
 
     def _get_Temperature(self):
         return self.cam.DeviceTemperature.GetValue()
+
+    def _get_BackLight(self):
+        status = self.cam.DeviceIndicatorMode.GetValue()
+        return (True  if status == PySpin.DeviceIndicatorMode_Active else
+                False if status == PySpin.DeviceIndicatorMode_Inactive else
+                status)
 
 def main():
     cap = VideoCapture(0)
