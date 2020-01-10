@@ -63,6 +63,10 @@ class VideoCapture:
             ret = self._set_GainAuto(PySpin.GainAuto_Off)
             if ret==False: return False
             return self._set_Gain(value)
+
+        #Brightness(EV) setting
+        if propId==cv2.CAP_PROP_BRIGHTNESS:
+            return self._set_Brightness(value)
         
         #Gamma setting
         if propId==cv2.CAP_PROP_GAMMA:
@@ -84,6 +88,9 @@ class VideoCapture:
 
         if propId==cv2.CAP_PROP_GAIN:
             return self._get_Gain()
+
+        if propId==cv2.CAP_PROP_BRIGHTNESS:
+            return self._get_Brightness()
 
         if propId==cv2.CAP_PROP_GAMMA:
             return self._get_Gamma()
@@ -127,6 +134,12 @@ class VideoCapture:
     def _set_GainAuto(self, value):
         self.cam.GainAuto.SetValue(value)
         return True
+    
+    def _set_Brightness(self, value):
+        if not type(value) in (int, float): return False
+        brightness_to_set = self.__clip(value, self.cam.AutoExposureEVCompensation.GetMin(), self.cam.AutoExposureEVCompensation.GetMax())
+        self.cam.AutoExposureEVCompensation.SetValue(brightness_to_set)
+        return True
 
     def _set_Gamma(self, value):
         if not type(value) in (int, float): return False
@@ -153,6 +166,9 @@ class VideoCapture:
 
     def _get_Gain(self):
         return self.cam.Gain.GetValue()
+
+    def _get_Brightness(self):
+        return self.cam.AutoExposureEVCompensation.GetValue()
 
     def _get_Gamma(self):
         return self.cam.Gamma.GetValue()
@@ -187,7 +203,6 @@ def main():
     cap.set(cv2.CAP_PROP_GAMMA, 1)
     cap.set(cv2.CAP_PROP_FPS, 30)
 
-
     while True:
         ret, frame = cap.read()
 
@@ -209,4 +224,3 @@ def main():
 
 if __name__=="__main__":
     main()
-    
