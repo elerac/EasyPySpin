@@ -29,7 +29,7 @@ cv2.imwrite("frame.png", frame)
 cap.release()
 ```
 ### Simple property settings
-You can access properties using `cap.set(propId, value)` or `cap.get(propId)`. See alson [supported propId](#Supported-VideoCaptureProperties).
+You can access properties using `cap.set(propId, value)` or `cap.get(propId)`. See also [supported propId](#Supported-VideoCaptureProperties).
 ```python
 cap.set(cv2.CAP_PROP_EXPOSURE, 100000) #us
 cap.set(cv2.CAP_PROP_GAIN, 10) #dB
