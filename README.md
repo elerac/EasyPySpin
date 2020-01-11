@@ -6,7 +6,7 @@ EasyPySpin is an unofficial wrapper for FLIR [Spinnaker SDK](https://www.flir.co
 * [PySpin](https://www.flir.com/support-center/iis/machine-vision/downloads/spinnaker-sdk-and-firmware-download/)
 * OpenCV
 
-## Live streaming
+## Run on command line
 Live streaming will start when `EasyPySpin.py` is executed.
 ```
 python EasyPySpin.py
