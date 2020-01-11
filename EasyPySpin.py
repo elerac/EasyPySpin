@@ -197,7 +197,7 @@ def main():
     cap = VideoCapture(0)
 
     if not cap.isOpened():
-        print("cap cant open\nexit")
+        print("cameta can't open\nexit")
         return -1
 
     cap.set(cv2.CAP_PROP_EXPOSURE, -1) #-1 sets exposure_time to auto
