@@ -31,7 +31,7 @@ cv2.imwrite("frame.png", frame)
     
 cap.release()
 ```
-### Accessing properties
+### Property settings
 You can access properties using `cap.set(propId, value)` or `cap.get(propId)`.
 ```python
 cap.set(cv2.CAP_PROP_GAMMA, 1.0)
