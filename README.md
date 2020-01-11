@@ -32,7 +32,7 @@ cv2.imwrite("frame.png", frame)
 cap.release()
 ```
 ### Accessing properties
-You can access the property using `cap.set(propId, value)` or `cap.get(propId)`.
+You can access properties using `cap.set(propId, value)` or `cap.get(propId)`.
 ```python
 cap.set(cv2.CAP_PROP_GAMMA, 1.0)
 cap.set(cv2.CAP_PROP_FPS, 30)
@@ -40,6 +40,9 @@ cap.set(cv2.CAP_PROP_FPS, 30)
 print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 ```
+
+### Advanced properties
+`cap.set()` and `cap.get()` can only access simple properties. To access advanced properties, you should use GenAPI or QuickSpinAPI.
 
 ## Supported VideoCaptureProperties
 * `cv2.CAP_PROP_EXPOSURE`
