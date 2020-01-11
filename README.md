@@ -15,6 +15,7 @@ python EasyPySpin.py
 ## Use as a module
 `EasyPySpin.py` can be used as a module.
 ### Capture image from camera
+Here's an example to capture image from camera. 
 ```python
 import cv2
 import EasyPySpin
