@@ -49,7 +49,9 @@ cap.cam.AdcBitDepth.SetValue(PySpin.AdcBitDepth_Bit12)
 cap.cam.PixelFormat.SetValue(PySpin.PixelFormat_Mono16)
 
 #GenAPI example
-
+node_exposureAuto = PySpin.CEnumerationPtr(cap.nodemap.GetNode("ExposureAuto"))
+exposureAuto = PySpin.CEnumEntryPtr(node_exposureAuto.GetEntryByName("Once")).GetValue()
+node_exposureAuto.SetIntValue(exposureAuto)
 ```
 
 ## Supported VideoCaptureProperties
