@@ -22,26 +22,23 @@ import EasyPySpin
 
 cap = EasyPySpin.VideoCapture(0)
 
-cap.set(cv2.CAP_PROP_EXPOSURE, 100000) #us
-cap.set(cv2.CAP_PROP_GAIN, 10) #dB
-
 ret, frame = cap.read()
 
 cv2.imwrite("frame.png", frame)
     
 cap.release()
 ```
-### Property settings
+### Simple property settings
 You can access properties using `cap.set(propId, value)` or `cap.get(propId)`.
 ```python
-cap.set(cv2.CAP_PROP_GAMMA, 1.0)
-cap.set(cv2.CAP_PROP_FPS, 30)
+cap.set(cv2.CAP_PROP_EXPOSURE, 100000) #us
+cap.set(cv2.CAP_PROP_GAIN, 10) #dB
 
 print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 ```
 
-### Advanced properties
+### Advanced property settings
 `cap.set()` and `cap.get()` can only access simple properties. To access advanced properties, you should use GenAPI or QuickSpinAPI.
 ```python
 #QuickSpinAPI example
