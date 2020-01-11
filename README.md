@@ -66,4 +66,5 @@ node_exposureAuto.SetIntValue(exposureAuto)
 ## External Links
 * [Spinnaker® SDK Programmer's Guide and API Reference (C++)](http://softwareservices.ptgrey.com/Spinnaker/latest/index.html)
 * [Getting Started with Spinnaker SDK on MacOS Applicable products](https://www.flir.com/support-center/iis/machine-vision/application-note/getting-started-with-spinnaker-sdk-on-macos/)
+* [Spinnaker Nodes](https://www.flir.com/support-center/iis/machine-vision/application-note/spinnaker-nodes/)
 * [Configuring Synchronized Capture with Multiple Cameras](https://www.flir.com/support-center/iis/machine-vision/application-note/configuring-synchronized-capture-with-multiple-cameras)
