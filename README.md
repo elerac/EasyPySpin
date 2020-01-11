@@ -43,6 +43,14 @@ print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 ### Advanced properties
 `cap.set()` and `cap.get()` can only access simple properties. To access advanced properties, you should use GenAPI or QuickSpinAPI.
+```python
+#QuickSpinAPI example
+cap.cam.AdcBitDepth.SetValue(PySpin.AdcBitDepth_Bit12)
+cap.cam.PixelFormat.SetValue(PySpin.PixelFormat_Mono16)
+
+#GenAPI example
+
+```
 
 ## Supported VideoCaptureProperties
 * `cv2.CAP_PROP_EXPOSURE`
