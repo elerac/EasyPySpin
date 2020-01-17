@@ -46,8 +46,6 @@ class VideoCapture:
 
         self.cam.Init()
         self.nodemap = self.cam.GetNodeMap()
-        print(type(self.cam))
-        print(type(self.nodemap))
         
         s_node_map = self.cam.GetTLStreamNodeMap()
         handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
