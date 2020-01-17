@@ -5,7 +5,7 @@ class VideoCapture:
     def __init__(self, index):
         self.system = PySpin.System.GetInstance()
         self.cam_list = self.system.GetCameras()
-        num_cam = self.cam_list.GetSize()
+        #num_cam = self.cam_list.GetSize()
         try:
             if type(index) is int:
                 self.cam = self.cam_list.GetByIndex(index)
