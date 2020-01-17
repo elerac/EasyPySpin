@@ -5,9 +5,16 @@ class VideoCapture:
     def __init__(self, index):
         self.system = PySpin.System.GetInstance()
         self.cam_list = self.system.GetCameras()
-        #num_cam = self.cam_list.GetSize()
-        try: self.cam = self.cam_list.GetByIndex(index)
-        except: return None
+        num_cam = self.cam_list.GetSize()
+        try:
+            if type(index) is int:
+                self.cam = self.cam_list.GetByIndex(index)
+            else:
+                self.cam = self.cam_list.GetBySerial(index)
+        except:
+            print("camera failed to properly initialize!")
+            return None
+
         self.cam.Init()
         self.nodemap = self.cam.GetNodeMap()
         
