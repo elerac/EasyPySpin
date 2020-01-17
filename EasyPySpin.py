@@ -2,7 +2,23 @@ import cv2
 import PySpin
 
 class VideoCapture:
+    """
+    Open a FLIR camera for video capturing.
+
+    Attributes
+    ----------
+    cam : PySpin.CameraPtr
+        camera
+    nodemap : PySpin.INodeMap
+        nodemap represents the elements of a camera description file.
+    """
     def __init__(self, index):
+        """
+        Parameters
+        ----------
+        index : int
+            id of the video capturing device to open.
+        """
         self._system = PySpin.System.GetInstance()
         self._cam_list = self._system.GetCameras()
         #num_cam = self.cam_list.GetSize()
@@ -17,6 +33,8 @@ class VideoCapture:
 
         self.cam.Init()
         self.nodemap = self.cam.GetNodeMap()
+        print(type(self.cam))
+        print(type(self.nodemap))
         
         s_node_map = self.cam.GetTLStreamNodeMap()
         handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
@@ -34,13 +52,29 @@ class VideoCapture:
         except: pass
 
     def release(self):
+        """
+        Closes capturing device. The method call VideoCapture destructor.
+        """
         self.__del__()
 
     def isOpened(self):
+        """
+        Returns true if video capturing has been initialized already.
+        """
         try: return self.cam.IsValid()
         except: return False
 
     def read(self):
+        """
+        returns the next frame.
+
+        Returns
+        -------
+        retval : bool
+            false if no frames has been grabbed.
+        image : array_like 
+            grabbed image is returned here. If no image has been grabbed the image will be None.
+        """
         if not self.cam.IsStreaming():
             self.cam.BeginAcquisition()
 
@@ -53,6 +87,21 @@ class VideoCapture:
         return True, img_NDArray
     
     def set(self, propId, value):
+        """
+        Sets a property in the VideoCapture.
+
+        Parameters
+        ----------
+        propId_id : cv2.VideoCaptureProperties
+            Property identifier from cv2.VideoCaptureProperties
+        value : int or float or bool
+            Value of the property.
+        
+        Returns
+        -------
+        retval : bool
+           True if property setting success.
+        """
         #Exposure setting
         if propId==cv2.CAP_PROP_EXPOSURE:
             #Auto
@@ -92,6 +141,19 @@ class VideoCapture:
         return False
     
     def get(self, propId):
+        """
+        Returns the specified VideoCapture property.
+        
+        Parameters
+        ----------
+        propId_id : cv2.VideoCaptureProperties
+            Property identifier from cv2.VideoCaptureProperties
+        
+        Returns
+        -------
+        value : int or float or bool
+           Value for the specified property. Value Flase is returned when querying a property that is not supported.
+        """
         if propId==cv2.CAP_PROP_EXPOSURE:
             return self._get_ExposureTime()
 
