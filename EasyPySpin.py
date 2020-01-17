@@ -11,6 +11,19 @@ class VideoCapture:
         camera
     nodemap : PySpin.INodeMap
         nodemap represents the elements of a camera description file.
+
+    Methods
+    -------
+    read()
+        returns the next frame.
+    release()
+        Closes capturing device.
+    isOpened()
+        Whether a camera is open or not.
+    set(propId, value)
+        Sets a property.
+    get(propId)
+        Gets a property.
     """
     def __init__(self, index):
         """
