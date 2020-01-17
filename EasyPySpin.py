@@ -3,14 +3,14 @@ import PySpin
 
 class VideoCapture:
     def __init__(self, index):
-        self.system = PySpin.System.GetInstance()
-        self.cam_list = self.system.GetCameras()
+        self._system = PySpin.System.GetInstance()
+        self._cam_list = self._system.GetCameras()
         #num_cam = self.cam_list.GetSize()
         try:
             if type(index) is int:
-                self.cam = self.cam_list.GetByIndex(index)
+                self.cam = self._cam_list.GetByIndex(index)
             else:
-                self.cam = self.cam_list.GetBySerial(index)
+                self.cam = self._cam_list.GetBySerial(index)
         except:
             print("camera failed to properly initialize!")
             return None
@@ -29,8 +29,8 @@ class VideoCapture:
                 self.cam.EndAcquisition()
             self.cam.DeInit()
             del self.cam
-            self.cam_list.Clear()
-            self.system.ReleaseInstance()
+            self._cam_list.Clear()
+            self._system.ReleaseInstance()
         except: pass
 
     def release(self):
