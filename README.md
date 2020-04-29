@@ -7,14 +7,14 @@ EasyPySpin is an unofficial wrapper for FLIR [Spinnaker SDK](https://www.flir.co
     * Download Spinnaker SDK from [here](https://www.flir.com/support-center/iis/machine-vision/downloads/spinnaker-sdk-and-firmware-download/).
 * OpenCV
 
-## Run on command line
-Live streaming will start when `EasyPySpin.py` is executed.
-```
-python EasyPySpin.py
+## Installation
+```sh
+git clone https://github.com/elerac/EasyPySpin.git
+cd EasyPySpin
+python setup.py install
 ```
 
-## Use as a module
-`EasyPySpin.py` can be used as a module.
+## Usage
 ### Capture image from camera
 Here's an example to capture image from camera. 
 ```python
