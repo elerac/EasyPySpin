@@ -1,8 +1,8 @@
 import EasyPySpin
 import cv2
+import argparse
 
 def main():
-    import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--index", type=int, default=0, help="Camera index (Default: 0)")
     parser.add_argument("-e", "--exposure",type=float, default=-1, help="Exposure time [us] (Default: Auto)")
