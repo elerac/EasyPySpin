@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='EasyPySpin',
-    version='1.0.0',
+    version='1.1.0',
     description='cv2.VideoCapture like wrapper for FLIR Spinnaker SDK',
     url='https://github.com/elerac/EasyPySpin',
     author='Ryota Maeda',

@@ -1,1 +1,2 @@
-from .EasyPySpin import VideoCapture
+from .videocapture import VideoCapture
+from .synchronizedvideocapture import SynchronizedVideoCapture
