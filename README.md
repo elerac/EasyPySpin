@@ -62,6 +62,8 @@ node_exposureAuto.SetIntValue(exposureAuto)
 * `cv2.CAP_PROP_FRAME_HEIGHT` (get only)
 * `cv2.CAP_PROP_TEMPERATURE` (get only)
 * `cv2.CAP_PROP_BACKLIGHT`
+* `cv2.CAP_PROP_TRIGGER`
+* `cv2.CAP_PROP_TRIGGER_DELAY`
 
 ## External Links
 * [Spinnaker® SDK Programmer's Guide and API Reference (C++)](http://softwareservices.ptgrey.com/Spinnaker/latest/index.html)
