@@ -11,6 +11,10 @@ class VideoCapture:
         camera
     nodemap : PySpin.INodeMap
         nodemap represents the elements of a camera description file.
+    grabTimeout : uint64_t
+        a 64bit value that represents a timeout in milliseconds
+    streamID : uint64_t
+        The stream to grab the image.
 
     Methods
     -------
@@ -51,6 +55,9 @@ class VideoCapture:
         handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
         handling_mode_entry = handling_mode.GetEntryByName('NewestOnly')
         handling_mode.SetIntValue(handling_mode_entry.GetValue())
+
+        self.grabTimeout = PySpin.EVENT_TIMEOUT_INFINITE
+        self.streamID = 0
         
     def __del__(self):
         try:
@@ -89,7 +96,7 @@ class VideoCapture:
         if not self.cam.IsStreaming():
             self.cam.BeginAcquisition()
 
-        image = self.cam.GetNextImage()
+        image = self.cam.GetNextImage(self.grabTimeout, self.streamID)
         if image.IsIncomplete():
             return False, None
         
