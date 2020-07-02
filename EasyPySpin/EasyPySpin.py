@@ -148,6 +148,14 @@ class VideoCapture:
         #BackLigth setting
         if propId==cv2.CAP_PROP_BACKLIGHT:
             return self._set_BackLight(value)
+        
+        #Trigger Mode setting (ON/OFF)
+        if propId==cv2.CAP_PROP_TRIGGER:
+            return self._set_Trigger(value)
+
+        #TriggerDelay setting
+        if propId==cv2.CAP_PROP_TRIGGER_DELAY:
+            return self._set_TriggerDelay(value)
 
         return False
     
@@ -191,6 +199,12 @@ class VideoCapture:
 
         if propId==cv2.CAP_PROP_BACKLIGHT:
             return self._get_BackLight()
+
+        if propId==cv2.CAP_PROP_TRIGGER:
+            return self._get_Trigger()
+
+        if propId==cv2.CAP_PROP_TRIGGER_DELAY:
+            return self._get_TriggerDelay()
 
         return False
     
@@ -243,6 +257,23 @@ class VideoCapture:
         self.cam.DeviceIndicatorMode.SetValue(backlight_to_set)
         return True
 
+    def _set_Trigger(self, value):
+        if value==True:
+            trigger_mode_to_set = PySpin.TriggerMode_On
+        elif value==False:
+            trigger_mode_to_set = PySpin.TriggerMode_Off
+        else:
+            return False
+
+        self.cam.TriggerMode.SetValue(trigger_mode_to_set)
+        return True
+
+    def _set_TriggerDelay(self, value):
+        if not type(value) in (int, float): return False
+        delay_to_set = self.__clip(value, self.cam.TriggerDelay.GetMin(), self.cam.TriggerDelay.GetMax())
+        self.cam.TriggerDelay.SetValue(delay_to_set)
+        return True
+
     def _get_ExposureTime(self):
         return self.cam.ExposureTime.GetValue()
 
@@ -272,3 +303,12 @@ class VideoCapture:
         return (True  if status == PySpin.DeviceIndicatorMode_Active else
                 False if status == PySpin.DeviceIndicatorMode_Inactive else
                 status)
+    
+    def _get_Trigger(self):
+        status = self.cam.TriggerMode.GetValue()
+        return (True  if status == PySpin.TriggerMode_On else
+                False if status == PySpin.TriggerMode_Off else
+                status)
+
+    def _get_TriggerDelay(self):
+        return self.cam.TriggerDelay.GetValue()
