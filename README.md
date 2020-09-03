@@ -13,6 +13,7 @@ git clone https://github.com/elerac/EasyPySpin.git
 cd EasyPySpin
 python setup.py install
 ```
+After installation, connect the camera and run `examples/video.py`.
 
 ## Usage
 ### Capture image from camera
