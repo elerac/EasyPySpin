@@ -34,7 +34,7 @@ def main():
         #frame = cv2.cvtColor(frame, cv2.COLOR_BayerBG2BGR) #for RGB camera demosaicing
 
         img_show = cv2.resize(frame, None, fx=args.scale, fy=args.scale)
-        cv2.imshow("capture", img_show)
+        cv2.imshow("press q to quit", img_show)
         key = cv2.waitKey(30)
         if key==ord("q"):
             break
