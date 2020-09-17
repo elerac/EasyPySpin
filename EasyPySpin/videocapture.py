@@ -1,5 +1,6 @@
 import cv2
 import PySpin
+from sys import stderr
 
 class VideoCapture:
     """
@@ -39,16 +40,37 @@ class VideoCapture:
         index : int
             id of the video capturing device to open.
         """
+        # Check for 'index' type
+        if isinstance(index, (int, str))==False:
+            raise TypeError("Argument 'index' is required to be an integer or a string")
+
+        # Cerate system instance and get camera list 
         self._system = PySpin.System.GetInstance()
         self._cam_list = self._system.GetCameras()
-        #num_cam = self.cam_list.GetSize()
+        num_cam = self._cam_list.GetSize()
+
+        # Check for available cameras
+        if num_cam==0:
+            print("EasyPySpin: no camera is available", file=stderr)
+            self._cam_list.Clear()
+            self._system.ReleaseInstance()
+            return None
+        
+        # Try to connect camera
         try:
+            # Index case
             if type(index) is int:
+                # Check for 'index' bound
+                if index<0 or num_cam-1<index:
+                    print(f"EasyPySpin: out device of bound (0-{num_cam-1}): {index}", file=stderr)
                 self.cam = self._cam_list.GetByIndex(index)
-            else:
+            # Serial case
+            elif type(index) is str:
                 self.cam = self._cam_list.GetBySerial(index)
         except:
-            print("camera failed to properly initialize!")
+            print("EasyPySpin: camera failed to properly initialize!", file=stderr)
+            self._cam_list.Clear()
+            self._system.ReleaseInstance()
             return None
 
         self.cam.Init()
