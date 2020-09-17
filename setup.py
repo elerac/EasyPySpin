@@ -8,5 +8,6 @@ setup(
     author='Ryota Maeda',
     author_email='maeda.ryota.elerac@gmail.com',
     license='MIT',
+    entry_points={'console_scripts': ['EasyPySpin= EasyPySpin.command_line:main']},
     packages=find_packages()
 )
