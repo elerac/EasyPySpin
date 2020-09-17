@@ -11,7 +11,7 @@ EasyPySpin is an unofficial wrapper for FLIR [Spinnaker SDK](https://www.flir.co
 ```sh
 pip install git+https://github.com/elerac/EasyPySpin
 ```
-After installation, connect the camera and run `examples/video.py`.
+After installation, connect the camera and try `examples/video.py`.
 
 ## Command Line Tool
 Connect the camera and execute the following commands, as shown below, then you can check the captured images.
