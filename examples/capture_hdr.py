@@ -11,7 +11,7 @@ def main():
     parser.add_argument("-i", "--index", type=int, default=0, help="Camera index (Default: 0)")
     parser.add_argument("-g", "--gain", type=float, default=0, help="Gain [dB] (Default: 0)")
     parser.add_argument("--min", type=float, default=5000, help="Minimum exposure time [us]")
-    parser.add_argument("--max", type=float, default=500000, help="Minimum exposure time [us]")
+    parser.add_argument("--max", type=float, default=500000, help="Maximum exposure time [us]")
     parser.add_argument("--num", type=int, default=8, help="Number of images to capture")
     parser.add_argument("-o", "--output", type=str, default="capture_hdr.exr", help="Output file name (*.exr)")
     args = parser.parse_args()
