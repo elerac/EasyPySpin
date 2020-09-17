@@ -13,6 +13,13 @@ pip install git+https://github.com/elerac/EasyPySpin
 ```
 After installation, connect the camera and run `examples/video.py`.
 
+## Command Line Tool
+Connect the camera and execute the following commands, as shown below, then you can check the captured images.
+```sh
+EasyPySpin
+```
+You can change some of the camera settings by adding the options to this command. Check with the `-h` option.
+
 ## Usage
 ### Capture image from camera
 Here's an example to capture image from camera. 
