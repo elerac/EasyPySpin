@@ -18,10 +18,7 @@ class SynchronizedVideoCapture:
         self.cap_primary = self._configure_as_primary(self.cap_primary)
         self.cap_secondary = self._configure_as_secondary(self.cap_secondary)
 
-        self.auto_software_trigger_execute = True
-        # Whether or not to execute a software trigger when executing "read()".
-        # (when the "TriggerMode" is "On" and the "TriggerSource" is set to "Software")
-        # If you want to execute software trigger at any time, set it to "False".
+        self.cap_primary.auto_software_trigger_execute = True
         
     def __del__(self):
         self.cap_primary.release()
@@ -42,7 +39,7 @@ class SynchronizedVideoCapture:
 
         if (self.cap_primary.cam.TriggerMode.GetValue()==PySpin.TriggerMode_On and 
             self.cap_primary.cam.TriggerSource.GetValue()==PySpin.TriggerSource_Software and 
-            self.auto_software_trigger_execute==True):
+            self.cap_primary.auto_software_trigger_execute==True):
             self.cap_primary.cam.TriggerSoftware.Execute()
 
         ret_p, frame_p = self.cap_primary.read()

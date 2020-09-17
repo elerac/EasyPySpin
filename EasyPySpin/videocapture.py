@@ -15,6 +15,9 @@ class VideoCapture:
         a 64bit value that represents a timeout in milliseconds
     streamID : uint64_t
         The stream to grab the image.
+    auto_software_trigger_execute : bool
+        Whether or not to execute a software trigger when executing "read()".
+        When the "TriggerMode" is "On" and the "TriggerSource" is set to "Software". (Default: False)
 
     Methods
     -------
@@ -58,6 +61,7 @@ class VideoCapture:
 
         self.grabTimeout = PySpin.EVENT_TIMEOUT_INFINITE
         self.streamID = 0
+        self.auto_software_trigger_execute = False
         
     def __del__(self):
         try:
@@ -95,6 +99,12 @@ class VideoCapture:
         """
         if not self.cam.IsStreaming():
             self.cam.BeginAcquisition()
+        
+        # Execute a software trigger if necessary 
+        if (self.cam.TriggerMode.GetValue()  ==PySpin.TriggerMode_On and 
+            self.cam.TriggerSource.GetValue()==PySpin.TriggerSource_Software and 
+            self.auto_software_trigger_execute==True):
+            self.cam.TriggerSoftware.Execute()
 
         image = self.cam.GetNextImage(self.grabTimeout, self.streamID)
         if image.IsIncomplete():
