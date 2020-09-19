@@ -67,7 +67,7 @@ class VideoCaptureEX(VideoCapture):
             return True, frame
     
 
-    def readHDR(self, t_min, t_max, num, t_ref=0.0166):
+    def readHDR(self, t_min, t_max, num, t_ref=10000):
         """
         Capture multiple images with different exposure and merge into an HDR image
 
@@ -76,13 +76,13 @@ class VideoCaptureEX(VideoCapture):
         Parameters
         ----------
         t_min : float
-            minimum exposure time
+            minimum exposure time [us]
         t_max : float
-            maximum exposure time
+            maximum exposure time [us]
         num : int
             number of shots
         t_ref : float, optional
-            Reference time. Determines the brightness of the merged image based on this time.
+            Reference time [us]. Determines the brightness of the merged image based on this time.
 
         Returns
         -------
@@ -99,10 +99,10 @@ class VideoCaptureEX(VideoCapture):
 
         # Exposure time to be taken 
         # The equality sequence from minimum (t_min) to maximum (t_max) exposure time
-        times_us = np.geomspace(t_min, t_max, num=num)
+        times = np.geomspace(t_min, t_max, num=num)
        
         # Exposure bracketing
-        ret, imlist = self.readExposureBracketing(times_us)
+        ret, imlist = self.readExposureBracketing(times)
         if ret==False:
             return False, None
         
@@ -121,7 +121,7 @@ class VideoCaptureEX(VideoCapture):
         imlist_norm = [ image/max_value for image in imlist]
         
         # Merge HDR
-        img_hdr = self.mergeHDR(imlist_norm, times_us*1e-6, t_ref)
+        img_hdr = self.mergeHDR(imlist_norm, times, t_ref)
 
         return True, img_hdr
    
