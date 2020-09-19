@@ -67,7 +67,7 @@ class VideoCaptureEX(VideoCapture):
             return True, frame
     
 
-    def readHDR(self, t_min, t_max, num, t_ref=10000):
+    def readHDR(self, t_min, t_max, num=None, t_ref=10000):
         """
         Capture multiple images with different exposure and merge into an HDR image
 
@@ -80,7 +80,8 @@ class VideoCaptureEX(VideoCapture):
         t_max : float
             maximum exposure time [us]
         num : int
-            number of shots
+            number of shots.
+            If 'num' is None, 'num' is automatically determined from 't_min' and 't_max'. It is set so that the ratio of neighboring exposure times is approximately 2x.
         t_ref : float, optional
             Reference time [us]. Determines the brightness of the merged image based on this time.
 
@@ -96,6 +97,12 @@ class VideoCaptureEX(VideoCapture):
 
         # To capture a linear image, the gamma value is set to 1.0
         self.set(cv2.CAP_PROP_GAMMA, 1.0)
+        
+        # If 'num' is None, determine num.
+        if num is None:
+            r = 2 # Ratio of exposure time
+            num = 1
+            while t_max>t_min*(r**num): num += 1
 
         # Exposure time to be taken 
         # The equality sequence from minimum (t_min) to maximum (t_max) exposure time
