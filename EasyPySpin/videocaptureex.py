@@ -197,7 +197,7 @@ class VideoCaptureEX(VideoCapture):
         return True, imlist
 
    
-    def mergeHDR(self, imlist, times, time_ref=10000, weighting='photon'):
+    def mergeHDR(self, imlist, times, time_ref=10000, weighting='gaussian'):
         """
         Merge an HDR image from LDR images.
 
