@@ -18,7 +18,7 @@ Connect the camera and execute the following commands, as shown below, then you 
 ```sh
 EasyPySpin
 ```
-You can change some of the camera settings by adding the options to this command. Check with the `-h` option.
+To change the camera settings, add an option to this command. Check with the `-h` option.
 
 ## Usage
 ### Capture image from camera
