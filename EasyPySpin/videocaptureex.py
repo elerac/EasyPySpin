@@ -92,6 +92,10 @@ class VideoCaptureEX(VideoCapture):
         image_hdr : array_like 
             merged HDR image is returned here. If no image has been grabbed the image will be None.
         """
+        # Set between the maximum and minimum values of the camera
+        t_min = np.clip(t_min, self.cam.ExposureTime.GetMin(), self.cam.ExposureTime.GetMax())
+        t_max = np.clip(t_max, self.cam.ExposureTime.GetMin(), self.cam.ExposureTime.GetMax())
+        
         # Original settings for gamma
         gamma_origin = self.get(cv2.CAP_PROP_GAMMA)
 
