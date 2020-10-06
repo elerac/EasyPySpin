@@ -186,6 +186,7 @@ class VideoCaptureEX(VideoCapture):
             imlist[i] = frame
        
         # Restore the changed settings
+        self.cam.EndAcquisition()
         self.cam.TriggerSelector.SetValue(TriggerSelector_origin)
         self.cam.TriggerMode.SetValue(TriggerMode_origin)
         self.cam.TriggerSource.SetValue(TriggerSource_origin)
