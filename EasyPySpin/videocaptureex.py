@@ -105,7 +105,7 @@ class VideoCaptureEX(VideoCapture):
         # If 'num' is None, determine num.
         if num is None:
             r = 2 # Ratio of exposure time
-            num = 1
+            num = 2
             while t_max>t_min*(r**num): num += 1
 
         # Exposure time to be taken 
