@@ -5,6 +5,14 @@ from .videocapture import VideoCapture
 import cv2
 import argparse
 
+def print_xy(event, x, y, flags, param):
+    """
+    Export xy coordinates in csv format by clicking
+    """
+    if event==cv2.EVENT_LBUTTONDOWN:
+        scale = param
+        print(f"{int(x/scale)}, {int(y/scale)}")
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--index", type=int, default=0, help="Camera index (Default: 0)")
@@ -30,6 +38,12 @@ def main():
     if args.gamma      is not None: cap.set(cv2.CAP_PROP_GAMMA, args.gamma)
     if args.fps        is not None: cap.set(cv2.CAP_PROP_FPS, args.fps)
     if args.brightness is not None: cap.set(cv2.CAP_PROP_BRIGHTNESS, args.brightness)
+    
+    # Window setting
+    winname = "press q to quit"
+    cv2.namedWindow(winname)
+    # Mouse event setting
+    cv2.setMouseCallback(winname, print_xy, args.scale)
 
     # Start capturing
     while True:
@@ -37,7 +51,7 @@ def main():
         #frame = cv2.cvtColor(frame, cv2.COLOR_BayerBG2BGR) #for RGB camera demosaicing
 
         img_show = cv2.resize(frame, None, fx=args.scale, fy=args.scale)
-        cv2.imshow("press q to quit", img_show)
+        cv2.imshow(winname, img_show)
         key = cv2.waitKey(30)
         if key==ord("q"):
             break
