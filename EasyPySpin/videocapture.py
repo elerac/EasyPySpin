@@ -81,10 +81,10 @@ class VideoCapture:
         self.cam.Init()
         self.nodemap = self.cam.GetNodeMap()
         
-        s_node_map = self.cam.GetTLStreamNodeMap()
-        handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
-        handling_mode_entry = handling_mode.GetEntryByName('NewestOnly')
-        handling_mode.SetIntValue(handling_mode_entry.GetValue())
+        # Switch 'StreamBufferHandlingMode' to 'NewestOnly'.
+        # This setting allows acquisition of the latest image 
+        # by ignoring old images in the buffer, just like a web cam.
+        self.cam.TLStream.StreamBufferHandlingMode.SetValue(PySpin.StreamBufferHandlingMode_NewestOnly)
 
         self.grabTimeout = PySpin.EVENT_TIMEOUT_INFINITE
         self.streamID = 0
