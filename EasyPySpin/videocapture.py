@@ -100,9 +100,8 @@ class VideoCapture:
             self._system.ReleaseInstance()
         except: pass
 
-    def release(self):
-        """
-        Closes capturing device. The method call VideoCapture destructor.
+    def release(self) -> None:
+        """Closes capturing device. The method call VideoCapture destructor.
         """
         self.__del__()
 
