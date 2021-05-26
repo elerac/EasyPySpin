@@ -268,6 +268,8 @@ class VideoCapture:
         gain_to_set = self.__clip(value, self.cam.Gain.GetMin(), self.cam.Gain.GetMax())
         self.cam.Gain.SetValue(gain_to_set)
         return True
+    def setExceptionMode(self, enable: bool) -> None:
+        """Switches exceptions mode.
 
     def _set_GainAuto(self, value):
         self.cam.GainAuto.SetValue(value)
@@ -278,12 +280,21 @@ class VideoCapture:
         brightness_to_set = self.__clip(value, self.cam.AutoExposureEVCompensation.GetMin(), self.cam.AutoExposureEVCompensation.GetMax())
         self.cam.AutoExposureEVCompensation.SetValue(brightness_to_set)
         return True
+        Methods raise exceptions if not successful instead of returning an error code.
 
     def _set_Gamma(self, value):
         if not type(value) in (int, float): return False
         gamma_to_set = self.__clip(value, self.cam.Gamma.GetMin(), self.cam.Gamma.GetMax())
         self.cam.Gamma.SetValue(gamma_to_set)
         return True
+        Parameters
+        ----------
+        enable : bool
+        """
+        if enable:
+            warnings.simplefilter('error', EasyPySpinWarning)
+        else:
+            warnings.simplefilter('ignore', EasyPySpinWarning)
 
     def _set_FrameRate(self, value):
         if not type(value) in (int, float): return False
