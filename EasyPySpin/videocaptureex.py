@@ -71,75 +71,79 @@ class VideoCaptureEX(VideoCapture):
             return True, frame
     
 
-    def readHDR(self, t_min, t_max, num=None, t_ref=10000):
-        """
-        Capture multiple images with different exposure and merge into an HDR image
 
-        NOTE: A software trigger is used to capture images. In order to acquire an image reliably at the set exposure time.
+    def readHDR(self, t_min: float, t_max: float, t_ref: float = 10000, ratio: float = 2.0) -> Tuple[bool, np.ndarray]:
+        """Capture multiple images with different exposure and merge into an HDR image.
 
         Parameters
         ----------
         t_min : float
-            minimum exposure time [us]
+            Minimum exposure time [us]
         t_max : float
-            maximum exposure time [us]
-        num : int
-            number of shots.
-            If 'num' is None, 'num' is automatically determined from 't_min' and 't_max'. It is set so that the ratio of neighboring exposure times is approximately 2x.
-        t_ref : float, optional
-            Reference time [us]. Determines the brightness of the merged image based on this time.
+            Maximum exposure time [us]
+        t_ref : float, default=10000
+            Reference time [us]. 
+            Determines the brightness of the merged image based on this time.
+        ratio : int, default=2.0
+            Ratio of exposure time.
+            Number of shots is automatically determined from `t_min` and `t_max`. 
+            It is set so that the `ratio` of neighboring exposure times.
 
         Returns
         -------
         retval : bool
             false if no frames has been grabbed.
-        image_hdr : array_like 
+        image_hdr : np.ndarray
             merged HDR image is returned here. If no image has been grabbed the image will be None.
+
+        Notes
+        -----
+        A software trigger is used to capture images. In order to acquire an image reliably at the set exposure time.
         """
         # Set between the maximum and minimum values of the camera
         t_min = np.clip(t_min, self.cam.ExposureTime.GetMin(), self.cam.ExposureTime.GetMax())
-        t_max = np.clip(t_max, self.cam.ExposureTime.GetMin(), self.cam.ExposureTime.GetMax())
+        t_max = np.clip(t_max, self.cam.ExposureTime.GetMin(), self.cam.ExposureTime.GetMax())    
         
+        # Determine nnumber of shots
+        num = 2
+        if ratio > 1.0:
+            while t_max > t_min*(ratio**num):
+                num += 1
+
+        # Exposure time to be taken 
+        # The equality sequence from minimum (t_min) to maximum (t_max) exposure time
+        times = np.geomspace(t_min, t_max, num=num)
+
         # Original settings for gamma
         gamma_origin = self.get(cv2.CAP_PROP_GAMMA)
 
         # To capture a linear image, the gamma value is set to 1.0
         self.set(cv2.CAP_PROP_GAMMA, 1.0)
-        
-        # If 'num' is None, determine num.
-        if num is None:
-            r = 2 # Ratio of exposure time
-            num = 2
-            while t_max>t_min*(r**num): num += 1
-
-        # Exposure time to be taken 
-        # The equality sequence from minimum (t_min) to maximum (t_max) exposure time
-        times = np.geomspace(t_min, t_max, num=num)
        
         # Exposure bracketing
         ret, imlist = self.readExposureBracketing(times)
-        if ret==False:
-            return False, None
-        
+
         # Restore the changed gamma
         self.set(cv2.CAP_PROP_GAMMA, gamma_origin)
+
+        if not ret:
+            return False, None
         
         # Normalize to a value between 0 and 1
         # By dividing by the maximum value
         dtype = imlist[0].dtype
-        if dtype==np.uint8:
-            max_value = 2**8-1
-        elif dtype==np.uint16:
-            max_value = 2**16-1
+        if dtype == np.uint8:
+            max_value = float(2**8-1)
+        elif dtype == np.uint16:
+            max_value = float(2**16-1)
         else:
-            max_value = 1
+            max_value = 1.0
         imlist_norm = [ image/max_value for image in imlist]
         
         # Merge HDR
         img_hdr = self.mergeHDR(imlist_norm, times, t_ref)
 
-        return True, img_hdr
-   
+        return True, img_hdr.astype(np.float32)
 
     def readExposureBracketing(self, exposures: np.ndarray) -> Tuple[bool, List[np.ndarray]]:
         """Execute exposure bracketing.
