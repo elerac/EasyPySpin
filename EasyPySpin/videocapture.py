@@ -92,13 +92,21 @@ class VideoCapture:
         
     def __del__(self):
         try:
-            if self.cam.IsStreaming():
-                self.cam.EndAcquisition()
-            self.cam.DeInit()
-            del self.cam
-            self._cam_list.Clear()
-            self._system.ReleaseInstance()
-        except: pass
+            if hasattr(self, "_cam"):
+                if self._cam.IsStreaming():
+                    self._cam.EndAcquisition()
+                del self._cam
+            
+            if hasattr(self, "_cam_list"):
+                self._cam_list.Clear()
+            
+            if hasattr(self, "_system"):
+                if not self._system.IsInUse():
+                    self._system.ReleaseInstance()
+                    del self._system
+
+        except PySpin.SpinnakerException:
+            pass
 
     def release(self) -> None:
         """Closes capturing device. The method call VideoCapture destructor.
