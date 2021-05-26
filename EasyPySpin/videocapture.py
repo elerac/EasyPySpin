@@ -1,7 +1,9 @@
 import warnings
+from typing import Union, Tuple
+
+import numpy as np
 import cv2
 import PySpin
-from sys import stderr
 
 from .utils import EasyPySpinWarning, warn
 
