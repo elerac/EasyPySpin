@@ -38,7 +38,7 @@ class VideoCapture:
     get(propId)
         Gets a property.
     """
-    def __init__(self, index):
+
     # a 64bit value that represents a timeout in milliseconds
     grabTimeout: int = PySpin.EVENT_TIMEOUT_INFINITE
     
@@ -48,11 +48,17 @@ class VideoCapture:
     # Whether or not to execute a software trigger when executing ``grab()``.
     auto_software_trigger_execute: bool = False
  
+    def __init__(self, index: Union[int, str] = None):
         """
         Parameters
         ----------
-        index : int
-            id of the video capturing device to open.
+        index : int or str, default=None
+            For ``int`` type, the index at which to retrieve the camera object.
+            For ``str`` type, the serial number of the camera object to retrieve.
+        """
+        if index is not None:
+            self.open(index)
+    
     @property
     def cam(self) -> Union[PySpin.CameraPtr, None]:
         """Provide ``PySpin.CameraPtr``.
