@@ -302,6 +302,8 @@ class VideoCapture:
         fps_to_set = self.__clip(value, self.cam.AcquisitionFrameRate.GetMin(), self.cam.AcquisitionFrameRate.GetMax())
         self.cam.AcquisitionFrameRate.SetValue(fps_to_set)
         return True
+    def set_pyspin_value(self, node_name: str, value: any) -> bool:
+        """Setting PySpin value with some useful checks.
 
     def _set_BackLight(self, value):
         if value==True:backlight_to_set = PySpin.DeviceIndicatorMode_Active
@@ -309,6 +311,16 @@ class VideoCapture:
         else: return False
         self.cam.DeviceIndicatorMode.SetValue(backlight_to_set)
         return True
+        This function adds functions that PySpin's ``SetValue`` does not support,
+        such as **writable check**, **argument type check**, **value range check and auto-clipping**.
+        If it fails, a warning will be raised. ``EasyPySpinWarning`` can control this warning.
+        
+        Parameters
+        ----------
+        node_name : str
+            Name of the node to set.
+        value : any
+            Value to set. The type is assumed to be ``int``, ``float``, ``bool``, ``str`` or ``PySpin Enumerate``.
 
     def _set_Trigger(self, value):
         if value==True:
@@ -316,6 +328,46 @@ class VideoCapture:
         elif value==False:
             trigger_mode_to_set = PySpin.TriggerMode_Off
         else:
+        Returns
+        -------
+        is_success : bool
+            Whether success or not: True for success, False for failure.
+
+        Examples
+        --------
+        Success case.
+
+        >>> set_pyspin_value("ExposureTime", 1000.0)
+        True
+        >>> set_pyspin_value("Width", 256)
+        True
+        >>> set_pyspin_value("GammaEnable", False)
+        True
+        >>> set_pyspin_value("ExposureAuto", PySpin.ExposureAuto_Off)
+        True
+        >>> set_pyspin_value("ExposureAuto", "Off")
+        True
+
+        Success case, and the value is clipped.
+        
+        >>> set_pyspin_value("ExposureTime", 0.1)
+        EasyPySpinWarning: 'ExposureTime' value must be in the range of [20.0, 30000002.0], so 0.1 become 20.0
+        True
+
+        Failure case.
+
+        >>> set_pyspin_value("Width", 256.0123)
+        EasyPySpinWarning: 'value' must be 'int', not 'float'
+        False
+        >>> set_pyspin_value("hoge", 1)
+        EasyPySpinWarning: 'CameraPtr' object has no attribute 'hoge'
+        False
+        >>> set_pyspin_value("ExposureAuto", "hoge")
+        EasyPySpinWarning: 'PySpin' object has no attribute 'ExposureAuto_hoge'
+        False
+        """
+        if not self.isOpened():
+            warn("Camera is not open")
             return False
 
         self.cam.TriggerMode.SetValue(trigger_mode_to_set)
@@ -325,6 +377,86 @@ class VideoCapture:
         if not type(value) in (int, float): return False
         delay_to_set = self.__clip(value, self.cam.TriggerDelay.GetMin(), self.cam.TriggerDelay.GetMax())
         self.cam.TriggerDelay.SetValue(delay_to_set)
+        # Check 'CameraPtr' object has attribute 'node_name'
+        if not hasattr(self.cam, node_name):
+            warn(f"'{type(self.cam).__name__}' object has no attribute '{node_name}'")
+            return False
+        
+        # Get attribution
+        node = getattr(self.cam, node_name)
+        
+        # Check 'node' object has attribute 'SetValue'
+        if not hasattr(node, "SetValue"):
+            warn(f"'{type(node).__name__}' object has no attribute 'SetValue'")
+            return False
+        
+        # Check node is writable
+        if not PySpin.IsWritable(node):
+            warn(f"'{node_name}' is not writable")
+            return False
+        
+        # Get type
+        node_type  = type(node)
+        value_type = type(value)
+        
+        # Convert numpy array with one element 
+        # into a standard Python scalar object
+        if value_type is np.ndarray:
+            if value.size == 1:
+                value = value.item()
+                value_type = type(value)
+        
+        # Check value type of Integer node case
+        if node_type is PySpin.IInteger:
+            if value_type is not int:
+                warn(f"'value' must be 'int', not '{value_type.__name__}'")
+                return False
+        
+        # Check value type of Float node case
+        elif node_type is PySpin.IFloat:
+            if value_type not in (int, float):
+                warn(f"'value' must be 'int' or 'float', not '{value_type.__name__}'")
+                return False
+        
+        # Check value type of Boolean node case
+        elif node_type is PySpin.IBoolean:
+            if value_type is not bool:
+                warn(f"'value' must be 'bool', not '{value_type.__name__}'")
+                return False
+
+        # Check value type of Enumeration node case
+        elif isinstance(node, PySpin.IEnumeration):
+            if value_type is str:
+                # If the type is ``str``, 
+                # replace the corresponding PySpin's Enumeration if it exists.
+                enumeration_name = f"{node_name}_{value}"
+                if hasattr(PySpin, enumeration_name):
+                    value = getattr(PySpin, enumeration_name)
+                    value_type = type(value)
+                else:
+                    warn(f"'PySpin' object has no attribute '{enumeration_name}'")
+                    return False
+            elif value_type is not int:
+                warn(f"'value' must be PySpin's Enumeration, not '{value_type.__name__}'")
+                return False
+        
+        # Clip the value when node type is Integer of Float
+        if node_type in (PySpin.IInteger, PySpin.IFloat):
+            v_min = node.GetMin()
+            v_max = node.GetMax()
+            value_clipped = min(max(value, v_min), v_max)
+            if value_clipped != value:
+                warn(f"'{node_name}' value must be in the range of [{v_min}, {v_max}], so {value} become {value_clipped}")
+                value = value_clipped
+
+        # Finally, SetValue
+        try:
+            node.SetValue(value)
+        except PySpin.SpinnakerException as e:
+            msg_pyspin = str(e)
+            warn(msg_pyspin)
+            return False
+        
         return True
 
     def _get_ExposureTime(self):
