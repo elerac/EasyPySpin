@@ -44,6 +44,14 @@ class VideoCapture:
         ----------
         index : int
             id of the video capturing device to open.
+    @property
+    def cam(self) -> Union[PySpin.CameraPtr, None]:
+        """Provide ``PySpin.CameraPtr``.
+        """
+        if hasattr(self, "_cam"):
+            return self._cam
+        else:
+            return None
         """
         # Check for 'index' type
         if isinstance(index, (int, str))==False:
