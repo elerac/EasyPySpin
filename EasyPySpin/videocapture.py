@@ -116,14 +116,17 @@ class VideoCapture:
     def read(self):
         """
         returns the next frame.
+    def grab(self) -> bool:
+        """Grabs the next frame from capturing device.
 
         Returns
         -------
         retval : bool
-            false if no frames has been grabbed.
-        image : array_like 
-            grabbed image is returned here. If no image has been grabbed the image will be None.
+            ``True`` the case of success.
         """
+        if not self.isOpened():
+            return False
+
         if not self.cam.IsStreaming():
             self.cam.BeginAcquisition()
         
@@ -131,7 +134,21 @@ class VideoCapture:
         if (self.cam.TriggerMode.GetValue()  ==PySpin.TriggerMode_On and 
             self.cam.TriggerSource.GetValue()==PySpin.TriggerSource_Software and 
             self.auto_software_trigger_execute==True):
+        # Execute a software trigger if required
+        if (PySpin.IsAvailable(self.cam.TriggerSoftware) 
+                and self.auto_software_trigger_execute):
+            # Software-Trigger is executed under TWO conditions. 
+            # First, the TriggerMode is set to ``On``
+            # and the TriggerSource is set to ``Software``, 
+            # so that SoftwareTrigger is available. 
+            # Second, the member variable ``auto_software_trigger_execute``  is set to ``True``.
             self.cam.TriggerSoftware.Execute()
+        
+        # Grab image
+        self._pyspin_image = self.cam.GetNextImage(self.grabTimeout, self.streamID)
+        
+        is_complete = not self._pyspin_image.IsIncomplete()
+        return is_complete
 
         image = self.cam.GetNextImage(self.grabTimeout, self.streamID)
         if image.IsIncomplete():
