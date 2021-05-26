@@ -1,6 +1,9 @@
+from typing import Union, Tuple, List
+
+import numpy as np
 import cv2
 import PySpin
-import numpy as np
+
 from .videocapture import VideoCapture
 from .utils import warn
 
