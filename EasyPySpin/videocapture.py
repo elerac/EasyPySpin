@@ -153,12 +153,27 @@ class VideoCapture:
         image = self.cam.GetNextImage(self.grabTimeout, self.streamID)
         if image.IsIncomplete():
             return False, None
+    def retrieve(self) -> Tuple[bool, Union[np.ndarray, None]]:
+        """Decodes and returns the grabbed video frame.
         
         img_NDArray = image.GetNDArray()
         image.Release()
         return True, img_NDArray
     
+        Returns
+        -------
+        retval : bool
+            ``False`` if no frames has been grabbed.
+        image : np.ndarray
+            grabbed image is returned here. If no image has been grabbed the image will be None.
         """
+        if hasattr(self, "_pyspin_image"):
+            image_array = self._pyspin_image.GetNDArray()
+            self._pyspin_image.Release()
+            del self._pyspin_image
+            return True, image_array
+        else:
+            return False, None
     
     def set(self, propId: 'cv2.VideoCaptureProperties', value: any) -> bool:
         """Sets a property in the VideoCapture.
