@@ -201,49 +201,39 @@ class VideoCaptureEX(VideoCapture):
 
         return True, imlist
 
-   
-    def mergeHDR(self, imlist, times, time_ref=10000, weighting='gaussian'):
+    def mergeHDR(self, imlist: List[np.ndarray], times: np.ndarray, time_ref: float = 10000) -> np.ndarray:
         """
         Merge an HDR image from LDR images.
 
         Parameters
         ----------
-        imlist : List[array_like]
+        imlist : List[np.ndarray]
             Multiple images with different exposure. The images are a range of 0.0 to 1.0.
-        times : array_like
+        times : np.ndarray
             Exposure times
         time_ref : float, optional
             Reference time. Determines the brightness of the merged image based on this time.
-        weighting : str, {'uniform', 'tent', 'gaussian', 'photon'}, optional
-            Weighting scheme
         
         Returns
         -------
-        img_hdr : array_like
+        img_hdr : np.ndarray
             merged HDR image is returned here.
         """
         Zmin = 0.01
         Zmax = 0.99
         epsilon = 1e-32
-        z = np.array(imlist) # (num, height, width)
-        t = (np.array(times) / time_ref)[:, np.newaxis, np.newaxis] # (num,1,1)
-
-        # Calculate weight
-        mask = np.bitwise_and(Zmin<=z, z<=Zmax)
-        if   weighting=='uniform':
-            w = 1.0 * mask
-        elif weighting=='tent':
-            w = (0.5-np.abs(z-0.5)) * mask
-        elif weighting=='gaussian':
-            w = np.exp(-4*((z-0.5)/0.5)**2) * mask
-        elif weighting=='photon':
-            w = t*np.ones_like(z) * mask
-        else:
-            raise ValueError(f"Unknown weighting scheme '{weighting}'.")
         
+        z = np.array(imlist) # (num, height, width) or (num, height, width, ch)
+
+        t = np.array(times) / time_ref # (num, )
+        t = np.expand_dims(t, axis=tuple(range(1, z.ndim))) # (num, 1, 1) or (num, 1, 1, 1)
+
+        # Calculate gaussian weight
+        mask = np.bitwise_and(Zmin<=z, z<=Zmax)
+        w = np.exp(-4*((z-0.5)/0.5)**2) * mask
+
         # Merge HDR
-        img_hdr = np.sum(w*z/t, axis=0) / (np.sum(w, axis=0) + epsilon)
-        #img_hdr = np.exp(np.sum(w*(np.log(z+epsilon)-np.log(t)), axis=0)/(np.sum(w, axis=0)+1e-32))
+        img_hdr = np.average(z/t, axis=0, weights=w+epsilon)
 
         # Dealing with under-exposure and over-exposure
         under_exposed = np.all(Zmin>z, axis=0)
