@@ -1,6 +1,9 @@
+import warnings
 import cv2
 import PySpin
 from sys import stderr
+
+from .utils import EasyPySpinWarning, warn
 
 class VideoCapture:
     """

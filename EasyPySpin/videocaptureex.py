@@ -2,6 +2,7 @@ import cv2
 import PySpin
 import numpy as np
 from .videocapture import VideoCapture
+from .utils import warn
 
 class VideoCaptureEX(VideoCapture):
     """
