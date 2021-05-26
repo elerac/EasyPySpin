@@ -13,13 +13,6 @@ pip install git+https://github.com/elerac/EasyPySpin
 ```
 After installation, connect the camera and try `examples/video.py`.
 
-## Command Line Tool
-Connect the camera and execute the following commands, as shown below, then you can check the captured images.
-```sh
-EasyPySpin
-```
-To change the camera settings, add an option to this command. Check with the `-h` option.
-
 ## Usage
 ### Capture image from camera
 Here's an example to capture image from camera. 
@@ -35,43 +28,60 @@ cv2.imwrite("frame.png", frame)
     
 cap.release()
 ```
+
 ### Basic property settings
 You can access properties using `cap.set(propId, value)` or `cap.get(propId)`. See also [supported propId](#Supported-VideoCaptureProperties).
 ```python
-cap.set(cv2.CAP_PROP_EXPOSURE, 100000) #us
-cap.set(cv2.CAP_PROP_GAIN, 10) #dB
+cap.set(cv2.CAP_PROP_EXPOSURE, 100000) # us
+cap.set(cv2.CAP_PROP_GAIN, 10) # dB
 
-print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+width  = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 ```
 
 ### Advanced property settings
-`cap.set()` and `cap.get()` can only access basic properties. To access advanced properties, you should use QuickSpinAPI or GenAPI.
+`cap.set()` and `cap.get()` can only access basic properties. To access advanced properties, you can use QuickSpin API, which PySpin supports.
 ```python
-#QuickSpinAPI example
 cap.cam.AdcBitDepth.SetValue(PySpin.AdcBitDepth_Bit12)
 cap.cam.PixelFormat.SetValue(PySpin.PixelFormat_Mono16)
+```
+The other way is to use `cap.set_pyspin_value()` or `cap.get_pyspin_value()`, which are supported by EasyPySpin. These methods check whether the variable is writeable or readable and check the type of the variable, etc., at the same time.
+```python
+cap.set_pyspin_value("AdcBitDepth", "Bit12")
+cap.set_pyspin_value("PixelFormat", "Mono16")
 
-#GenAPI example
-node_exposureAuto = PySpin.CEnumerationPtr(cap.nodemap.GetNode("ExposureAuto"))
-exposureAuto = PySpin.CEnumEntryPtr(node_exposureAuto.GetEntryByName("Once")).GetValue()
-node_exposureAuto.SetIntValue(exposureAuto)
+cap.get_pyspin_value("GammaEnable")
+cap.get_pyspin_value("DeviceModelName")
 ```
 
 ## Supported VideoCaptureProperties
-* `cv2.CAP_PROP_EXPOSURE`
-* `cv2.CAP_PROP_GAIN`
-* `cv2.CAP_PROP_GAMMA`
-* `cv2.CAP_PROP_FPS`
-* `cv2.CAP_PROP_BRIGHTNESS` 
-* `cv2.CAP_PROP_FRAME_WIDTH` (get only)
-* `cv2.CAP_PROP_FRAME_HEIGHT` (get only)
-* `cv2.CAP_PROP_TEMPERATURE` (get only)
-* `cv2.CAP_PROP_BACKLIGHT`
-* `cv2.CAP_PROP_TRIGGER`
-* `cv2.CAP_PROP_TRIGGER_DELAY`
+Here is the list of supported VideoCaptureProperties. 
+In `set(propId, value)` and `get(propId)`, PySpin is used to set and get the camera's settings. The relationship between `propId` and PySpin settings is designed to be as close in meaning as possible. The table below shows the relationship between `propId` and PySpin settings in pseudo-code format.
+
+| propId                       | type  | set(propId, value) | value = get(propId) |
+| ----                         | ----  | ----        | ----        |
+| `cv2.CAP_PROP_FRAME_WIDTH`   | int   | `Width` = value | value = `Width` |
+| `cv2.CAP_PROP_FRAME_HEIGHT`  | int   | `Height` = value | value = `Height` |
+| `cv2.CAP_PROP_FPS`           | float | `AcquisitionFrameRateEnable` = `True` <br>  `AcquisitionFrameRate` = value | value = `ResultingFrameRate`| 
+| `cv2.CAP_PROP_BRIGHTNESS`    | float | `AutoExposureEVCompensation` = value | value = `AutoExposureEVCompensation` |
+| `cv2.CAP_PROP_GAIN`          | float | if value != -1 <br> &nbsp; `GainAuto` = `Off` <br> &nbsp; `Gain` = value <br> else <br> &nbsp; `GainAuto` = `Continuous` | value = `Gain` |
+| `cv2.CAP_PROP_EXPOSURE`      | float | if value != -1 <br> &nbsp; `ExposureAuto` = `Off` <br> &nbsp; `ExposureTime` = value <br> else <br> &nbsp; `ExposureAuto` = `Continuous` | value = `ExposureTime` |
+| `cv2.CAP_PROP_GAMMA`         | float | `GammaEnable` = `True` <br> `Gamma` = value | value = `Gamma` |
+| `cv2.CAP_PROP_TEMPERATURE`   | float | | value = `DeviceTemperature` |
+| `cv2.CAP_PROP_TRIGGER`       | bool  | if value == `True` <br> &nbsp; `TriggerMode` = `On` <br> else <br> &nbsp; `TriggerMode` = `Off` | if trigger_mode == `On` <br> &nbsp; value = `True` <br> elif trigger_mode == `Off` <br> &nbsp; value = `False` |
+| `cv2.CAP_PROP_TRIGGER_DELAY` | float | `TriggerDelay` = value | value = `TriggerDelay` | 
+| `cv2.CAP_PROP_BACKLIGHT`     | bool  | if value == `True` <br> &nbsp; `DeviceIndicatorMode` = `Active` <br> else <br> &nbsp; `DeviceIndicatorMode` = `Inactive` | if device_indicator_mode == `Active` <br> &nbsp; value = `True` <br> elif device_indicator_mode == `Inactive` <br> &nbsp; value = `False` |
+| `cv2.CAP_PROP_AUTO_WB`       | bool  | if value == `True` <br> &nbsp; `BalanceWhiteAuto` = `Continuous` <br> else <br> &nbsp; `BalanceWhiteAuto` = `Off` | if balance_white_auto == `Continuous` <br> &nbsp; value = `True` <br> elif balance_white_auto == `Off` <br> &nbsp; value = `False` |
+
+## Command-Line Tool
+EasyPySpin provides a command-line tool. Connect the camera and execute the following commands, as shown below, then you can view the captured images.
+```sh
+EasyPySpin [-h] [-i INDEX] [-e EXPOSURE] [-g GAIN] [-G GAMMA]
+           [-b BRIGHTNESS] [-f FPS] [-s SCALE]
+```
 
 ## External Links
+Here are some external links that are useful for using Spinnaker SDK.
 * [Spinnaker® SDK Programmer's Guide and API Reference (C++)](http://softwareservices.ptgrey.com/Spinnaker/latest/index.html)
 * [Getting Started with Spinnaker SDK on MacOS Applicable products](https://www.flir.com/support-center/iis/machine-vision/application-note/getting-started-with-spinnaker-sdk-on-macos/)
 * [Spinnaker Nodes](https://www.flir.com/support-center/iis/machine-vision/application-note/spinnaker-nodes/)
