@@ -106,14 +106,21 @@ class VideoCapture:
         """
         self.__del__()
 
-    def isOpened(self):
-        """
-        Returns true if video capturing has been initialized already.
-        """
-        try: return self.cam.IsValid()
-        except: return False
+    def isOpened(self) -> bool:
+        """Returns ``True`` if video capturing has been initialized already.
 
+        Returns
+        -------
+        retval : bool
         """
+        if self.cam is not None:
+            try:
+                return self.cam.IsValid()
+            except AttributeError:
+                return False
+        else:
+            return False
+
     def grab(self) -> bool:
         """Grabs the next frame from capturing device.
 
