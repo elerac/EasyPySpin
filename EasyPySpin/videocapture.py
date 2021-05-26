@@ -52,10 +52,23 @@ class VideoCapture:
             return self._cam
         else:
             return None
+
+    def open(self, index: Union[int, str]) -> bool:
+        """Open a capturing device for video capturing.
+
+        Parameters
+        ----------
+        index : int or str
+            ``int`` type, the index at which to retrieve the camera object.
+            ``str`` type, the serial number of the camera object to retrieve.
+
+        Returns
+        -------
+        retval : bool
+            ``True`` if the file has been successfully opened.
         """
-        # Check for 'index' type
-        if isinstance(index, (int, str))==False:
-            raise TypeError("Argument 'index' is required to be an integer or a string")
+        # Close the already opened camera
+        self.release()
 
         # Cerate system instance and get camera list 
         self._system = PySpin.System.GetInstance()
@@ -63,31 +76,33 @@ class VideoCapture:
         num_cam = self._cam_list.GetSize()
 
         # Check for available cameras
-        if num_cam==0:
-            print("EasyPySpin: no camera is available", file=stderr)
-            self._cam_list.Clear()
-            self._system.ReleaseInstance()
-            return None
+        if num_cam == 0:
+            warn("no camera is available")
+            self.release()
+            return False
         
-        # Try to connect camera
-        try:
-            # Index case
-            if type(index) is int:
-                # Check for 'index' bound
-                if index<0 or num_cam-1<index:
-                    print(f"EasyPySpin: out device of bound (0-{num_cam-1}): {index}", file=stderr)
-                self.cam = self._cam_list.GetByIndex(index)
-            # Serial case
-            elif type(index) is str:
-                self.cam = self._cam_list.GetBySerial(index)
-        except:
-            print("EasyPySpin: camera failed to properly initialize!", file=stderr)
-            self._cam_list.Clear()
-            self._system.ReleaseInstance()
-            return None
+        # Get CameraPtr
+        if type(index) is int:
+            if index in range(num_cam):
+                self._cam = self._cam_list.GetByIndex(index)
+            else:
+                warn(f"out device of bound (0-{num_cam-1}): {index}")
+                self.release()
+                return False
+        elif type(index) is str:
+            self._cam = self._cam_list.GetBySerial(index)
+        else:
+            warn(f"'index' must be 'int' or 'str', not '{type(index).__name__}'")
+            self.release()
+            return False
+            
+        if not self._cam.IsValid():
+            self.release()
+            return False
 
-        self.cam.Init()
-        self.nodemap = self.cam.GetNodeMap()
+        # Initialize camera
+        if not self.cam.IsInitialized():
+            self.cam.Init()
         
         # Switch 'StreamBufferHandlingMode' to 'NewestOnly'.
         # This setting allows acquisition of the latest image 
@@ -97,6 +112,7 @@ class VideoCapture:
         self.grabTimeout = PySpin.EVENT_TIMEOUT_INFINITE
         self.streamID = 0
         self.auto_software_trigger_execute = False
+        return True
         
     def __del__(self):
         try:
