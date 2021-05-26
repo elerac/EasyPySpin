@@ -141,9 +141,8 @@ class VideoCaptureEX(VideoCapture):
         return True, img_hdr
    
 
-    def readExposureBracketing(self, exposures):
-        """
-        Execute exposure bracketing.
+    def readExposureBracketing(self, exposures: np.ndarray) -> Tuple[bool, List[np.ndarray]]:
+        """Execute exposure bracketing.
 
         Parameters
         ----------
@@ -158,46 +157,44 @@ class VideoCaptureEX(VideoCapture):
             Captured image list
         """
         # Original settings for triggers, exposure, gain
-        TriggerSelector_origin = self.cam.TriggerSelector.GetValue()
-        TriggerMode_origin = self.cam.TriggerMode.GetValue()
-        TriggerSource_origin = self.cam.TriggerSource.GetValue()
+        node_names_to_change = ["TriggerSelector", "TriggerMode", "TriggerSource", "ExposureTime", "ExposureAuto", "GainAuto"] 
+        values_origin = [self.get_pyspin_value(node_name) for node_name in node_names_to_change]
         auto_software_trigger_execute_origin = self.auto_software_trigger_execute
-        ExposureAuto_origin = self.cam.ExposureAuto.GetValue()
-        ExposureTime_origin = self.cam.ExposureTime.GetValue()
-        GainAuto_origin = self.cam.GainAuto.GetValue()
-        Gain_origin = self.cam.Gain.GetValue()
         
         # Change the trigger setting
-        self.cam.TriggerSelector.SetValue(PySpin.TriggerSelector_FrameStart)
-        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
-        self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Software)
+        self.set_pyspin_value("TriggerSelector", "FrameStart")
+        self.set_pyspin_value("TriggerMode", "On")
+        self.set_pyspin_value("TriggerSource", "Software")
         self.auto_software_trigger_execute = True
 
         # Auto gain off and fixing gain
-        self.cam.GainAuto.SetValue(PySpin.GainAuto_Off)
-        self.cam.Gain.SetValue(Gain_origin)
+        gain = self.get_pyspin_value("Gain")
+        self.set_pyspin_value("GainAuto", "Off")
+        self.set_pyspin_value("Gain", gain)
         
         # Capture start
-        imlist = [None]*exposures.shape[0]
-        for i , t in enumerate(exposures):
+        imlist = []
+        for i, t in enumerate(exposures):
             self.set(cv2.CAP_PROP_EXPOSURE, float(t))
+
+            # Dummy image
+            if i == 0:
+                for _ in range(3):
+                    self.grab()
 
             ret, frame = self.read()
 
-            if ret==False:
+            if not ret:
                 return False, None
 
-            imlist[i] = frame
-       
-        # Restore the changed settings
+            imlist.append(frame)
+
         self.cam.EndAcquisition()
-        self.cam.TriggerSelector.SetValue(TriggerSelector_origin)
-        self.cam.TriggerMode.SetValue(TriggerMode_origin)
-        self.cam.TriggerSource.SetValue(TriggerSource_origin)
+
+        # Restore the changed settings
+        for node_name, value in zip(node_names_to_change, values_origin):
+            self.set_pyspin_value(node_name, value)
         self.auto_software_trigger_execute = auto_software_trigger_execute_origin
-        self.cam.ExposureTime.SetValue(ExposureTime_origin)
-        self.cam.ExposureAuto.SetValue(ExposureAuto_origin)
-        self.cam.GainAuto.SetValue(GainAuto_origin)
 
         return True, imlist
 
