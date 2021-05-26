@@ -41,15 +41,7 @@ class VideoCaptureEX(VideoCapture):
     get(propId)
         Gets a property.
     """
-    def __init__(self, index):
-        """
-        Parameters
-        ----------
-        index : int
-            id of the video capturing device to open.
-        """
-        super(VideoCaptureEX, self).__init__(index)
-        self.average_num = 1
+
     # Number of images to average
     __average_num: int = 1
 
