@@ -50,6 +50,19 @@ class VideoCaptureEX(VideoCapture):
         """
         super(VideoCaptureEX, self).__init__(index)
         self.average_num = 1
+    # Number of images to average
+    __average_num: int = 1
+
+    @property
+    def average_num(self) -> int:
+        return self.__average_num
+
+    @average_num.setter
+    def average_num(self, value: int):
+        if (type(value) is int) and (value >= 1):
+            self.__average_num = value
+        else:
+            warn(f"'average_num' must be natural number, {value} is invalid")
 
     def read(self) -> Tuple[bool, np.ndarray]:
         """Returns the next frame.
