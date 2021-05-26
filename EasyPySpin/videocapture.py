@@ -113,9 +113,7 @@ class VideoCapture:
         try: return self.cam.IsValid()
         except: return False
 
-    def read(self):
         """
-        returns the next frame.
     def grab(self) -> bool:
         """Grabs the next frame from capturing device.
 
@@ -130,10 +128,6 @@ class VideoCapture:
         if not self.cam.IsStreaming():
             self.cam.BeginAcquisition()
         
-        # Execute a software trigger if necessary 
-        if (self.cam.TriggerMode.GetValue()  ==PySpin.TriggerMode_On and 
-            self.cam.TriggerSource.GetValue()==PySpin.TriggerSource_Software and 
-            self.auto_software_trigger_execute==True):
         # Execute a software trigger if required
         if (PySpin.IsAvailable(self.cam.TriggerSoftware) 
                 and self.auto_software_trigger_execute):
@@ -150,16 +144,9 @@ class VideoCapture:
         is_complete = not self._pyspin_image.IsIncomplete()
         return is_complete
 
-        image = self.cam.GetNextImage(self.grabTimeout, self.streamID)
-        if image.IsIncomplete():
-            return False, None
     def retrieve(self) -> Tuple[bool, Union[np.ndarray, None]]:
         """Decodes and returns the grabbed video frame.
         
-        img_NDArray = image.GetNDArray()
-        image.Release()
-        return True, img_NDArray
-    
         Returns
         -------
         retval : bool
@@ -172,6 +159,26 @@ class VideoCapture:
             self._pyspin_image.Release()
             del self._pyspin_image
             return True, image_array
+        else:
+            return False, None
+
+    def read(self) -> Tuple[bool, Union[np.ndarray, None]]:
+        """Grabs, decodes and returns the next video frame.
+
+        The method combines ``grab()`` and ``retrieve()`` in one call. 
+        This is the most convenient method for capturing data from decode and returns the just grabbed frame. 
+        If no frames has been grabbed, the method returns ``False`` and the function returns ``None``.
+
+        Returns
+        -------
+        retval : bool
+            ``False`` if no frames has been grabbed.
+        image : np.ndarray 
+            grabbed image is returned here. If no image has been grabbed the image will be ``None``.
+        """
+        retval = self.grab()
+        if retval:
+            return self.retrieve()
         else:
             return False, None
     
