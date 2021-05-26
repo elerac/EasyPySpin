@@ -51,26 +51,49 @@ class VideoCaptureEX(VideoCapture):
         super(VideoCaptureEX, self).__init__(index)
         self.average_num = 1
 
-    def read(self):
-        """
-        returns the next frame.
-        The returned frame is the average of multiple images taken.
+    def read(self) -> Tuple[bool, np.ndarray]:
+        """Returns the next frame.
+
+        The returned frame is the **average of multiple images**.
 
         Returns
         -------
         retval : bool
             false if no frames has been grabbed.
-        image : array_like 
+        image : np.ndarray
             grabbed image is returned here. If no image has been grabbed the image will be None.
+
+        Examples
+        --------
+        Noemal case
+        >>> cap.average_num = 1
+        >>> ret, frame = cap.read()
+        
+        Average of multiple images case
+        
+        >>> cap.average_num = 10
+        >>> ret, frame = cap.read()
         """
-        if self.average_num==1:
+        average_num = self.average_num
+
+        if average_num == 1:
             return super(VideoCaptureEX, self).read()
         else:
-            imlist = [ super(VideoCaptureEX, self).read()[1] for i in range(self.average_num) ]
-            frame = (cv2.merge(imlist).mean(axis=2)).astype(imlist[0].dtype)
-            return True, frame
-    
+            for i in range(average_num):
+                ret, image = super(VideoCaptureEX, self).read()
 
+                if i == 0:
+                    rets = np.empty((average_num), dtype=np.bool)
+                    images = np.empty((*image.shape, average_num), dtype=image.dtype)
+                
+                rets[i] = ret
+                images[..., i] = image
+            
+            if np.all(rets):
+                image_averaged = np.mean(images, axis=-1).astype(image.dtype)
+                return True, image_averaged
+            else:
+                return False, None
 
     def readHDR(self, t_min: float, t_max: float, t_ref: float = 10000, ratio: float = 2.0) -> Tuple[bool, np.ndarray]:
         """Capture multiple images with different exposure and merge into an HDR image.
