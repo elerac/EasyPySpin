@@ -464,24 +464,72 @@ class VideoCapture:
 
     def _get_Gain(self):
         return self.cam.Gain.GetValue()
+    def get_pyspin_value(self, node_name: str) -> any:
+        """Getting PySpin value with some useful checks.
 
     def _get_Brightness(self):
         return self.cam.AutoExposureEVCompensation.GetValue()
+        Parameters
+        ----------
+        node_name : str
+            Name of the node to get.
 
     def _get_Gamma(self):
         return self.cam.Gamma.GetValue()
+        Returns
+        -------
+        value : any
+            value
 
     def _get_Width(self):
         return self.cam.Width.GetValue()
+        Examples
+        --------
+        Success case.
 
     def _get_Height(self):
         return self.cam.Height.GetValue()
+        >>> get_pyspin_value("ExposureTime")
+        103.0
+        >>> get_pyspin_value("GammaEnable")
+        True
+        >>> get_pyspin_value("ExposureAuto")
+        0
 
     def _get_FrameRate(self):
         return self.cam.AcquisitionFrameRate.GetValue()
+        Failure case.
 
     def _get_Temperature(self):
         return self.cam.DeviceTemperature.GetValue()
+        >>> get_pyspin_value("hoge")
+        EasyPySpinWarning: 'CameraPtr' object has no attribute 'hoge'
+        None
+        """
+        if not self.isOpened():
+            warn("Camera is not open")
+            return False
+        
+        # Check 'CameraPtr' object has attribute 'node_name'
+        if not hasattr(self.cam, node_name):
+            warn(f"'{type(self.cam).__name__}' object has no attribute '{node_name}'")
+            return None
+        
+        # Get attribution
+        node = getattr(self.cam, node_name)
+        
+        # Check 'node_name' object has attribute 'GetValue'
+        if not hasattr(node, "GetValue"):
+            warn(f"'{type(node).__name__}' object has no attribute 'GetValue'")
+            return None
+        
+        # Check node is readable
+        if not PySpin.IsReadable(node):
+            warn(f"'{node_name}' is not readable")
+            return None
+        
+        # Finally, GetValue
+        value = node.GetValue()
 
     def _get_BackLight(self):
         status = self.cam.DeviceIndicatorMode.GetValue()
@@ -497,3 +545,4 @@ class VideoCapture:
 
     def _get_TriggerDelay(self):
         return self.cam.TriggerDelay.GetValue()
+        return value
