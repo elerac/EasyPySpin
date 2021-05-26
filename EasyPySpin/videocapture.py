@@ -39,6 +39,15 @@ class VideoCapture:
         Gets a property.
     """
     def __init__(self, index):
+    # a 64bit value that represents a timeout in milliseconds
+    grabTimeout: int = PySpin.EVENT_TIMEOUT_INFINITE
+    
+    # The stream to grab the image.
+    streamID: int = 0
+    
+    # Whether or not to execute a software trigger when executing ``grab()``.
+    auto_software_trigger_execute: bool = False
+ 
         """
         Parameters
         ----------
@@ -109,9 +118,6 @@ class VideoCapture:
         # by ignoring old images in the buffer, just like a web cam.
         self.cam.TLStream.StreamBufferHandlingMode.SetValue(PySpin.StreamBufferHandlingMode_NewestOnly)
 
-        self.grabTimeout = PySpin.EVENT_TIMEOUT_INFINITE
-        self.streamID = 0
-        self.auto_software_trigger_execute = False
         return True
         
     def __del__(self):
