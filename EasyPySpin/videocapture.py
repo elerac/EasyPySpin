@@ -8,35 +8,56 @@ import PySpin
 from .utils import EasyPySpinWarning, warn
 
 class VideoCapture:
-    """
-    Open a FLIR camera for video capturing.
+    """Open a FLIR camera for video capturing.
 
     Attributes
     ----------
     cam : PySpin.CameraPtr
-        camera
-    nodemap : PySpin.INodeMap
-        nodemap represents the elements of a camera description file.
-    grabTimeout : uint64_t
+        PySpin camera pointer.
+    grabTimeout : int, default=PySpin.EVENT_TIMEOUT_INFINITE
         a 64bit value that represents a timeout in milliseconds
-    streamID : uint64_t
+    streamID : int, default=0
         The stream to grab the image.
-    auto_software_trigger_execute : bool
-        Whether or not to execute a software trigger when executing "read()".
-        When the "TriggerMode" is "On" and the "TriggerSource" is set to "Software". (Default: False)
+    auto_software_trigger_execute : bool, default=False
+        Whether or not to execute a software trigger when executing ``grab()``.
+        When the SoftwareTrigger is available.
 
     Methods
     -------
-    read()
-        returns the next frame.
-    release()
-        Closes capturing device.
-    isOpened()
-        Whether a camera is open or not.
-    set(propId, value)
-        Sets a property.
     get(propId)
         Gets a property.
+    grab()
+        Grabs the next frame from capturing device.
+    isOpened()
+        Whether a camera is open or not.
+    open()
+        Open a capturing device for video capturing.
+    read()
+        Returns the next frame.
+    release()
+        Closes capturing device.
+    retrieve()
+        Decodes and returns the grabbed video frame.
+    set(propId, value)
+        Sets a property.
+    setExceptionMode(enable)
+        Switches exceptions mode.
+
+    Notes
+    -----
+    Supported ``cv2.VideoCaptureProperties`` for ``set()`` or ``get()`` methods.
+    `cv2.CAP_PROP_FPS`
+    `cv2.CAP_PROP_FRAME_WIDTH`
+    `cv2.CAP_PROP_FRAME_HEIGHT`
+    `cv2.CAP_PROP_BRIGHTNESS`
+    `cv2.CAP_PROP_GAIN`
+    `cv2.CAP_PROP_EXPOSURE`
+    `cv2.CAP_PROP_GAMMA`
+    `cv2.CAP_PROP_TEMPERATURE` (get only)
+    `cv2.CAP_PROP_TRIGGER`
+    `cv2.CAP_PROP_TRIGGER_DELAY`
+    `cv2.CAP_PROP_BACKLIGHT`
+    `cv2.CAP_PROP_AUTO_WB`
     """
 
     # a 64bit value that represents a timeout in milliseconds
