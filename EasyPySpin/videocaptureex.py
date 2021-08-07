@@ -82,6 +82,12 @@ class VideoCaptureEX(VideoCapture):
         else:
             warn(f"'average_num' must be natural number, {value} is invalid")
 
+    def grab(self):
+        raise Exception("VideoCaptureEX does not support `grab` module")
+
+    def retrieve(self):
+        raise Exception("VideoCaptureEX does not support `retrieve` module")
+
     def read(self) -> Tuple[bool, np.ndarray]:
         """Returns the next frame.
 
