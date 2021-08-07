@@ -227,8 +227,6 @@ class VideoCapture:
         """
         if hasattr(self, "_pyspin_image"):
             image_array = self._pyspin_image.GetNDArray()
-            self._pyspin_image.Release()
-            del self._pyspin_image
             return True, image_array
         else:
             return False, None
