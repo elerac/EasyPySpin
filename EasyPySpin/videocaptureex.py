@@ -255,8 +255,9 @@ class VideoCaptureEX(VideoCapture):
         self.auto_software_trigger_execute = auto_software_trigger_execute_origin
 
         return True, imlist
-
-    def mergeHDR(self, imlist: List[np.ndarray], times: np.ndarray, time_ref: float = 10000) -> np.ndarray:
+    
+    @staticmethod
+    def mergeHDR(imlist: List[np.ndarray], times: np.ndarray, time_ref: float = 10000) -> np.ndarray:
         """
         Merge an HDR image from LDR images.
 
@@ -296,4 +297,4 @@ class VideoCaptureEX(VideoCapture):
         img_hdr[under_exposed] = Zmin/np.max(t)
         img_hdr[over_exposed]  = Zmax/np.min(t)
 
-        return img_hdr
+        return img_hdr        return img_hdr
