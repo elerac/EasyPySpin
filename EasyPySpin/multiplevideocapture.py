@@ -1,10 +1,11 @@
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Any
 from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import PySpin
 
 from .videocapture import VideoCapture
+
 
 class MultipleVideoCapture:
     """VideoCapture for Multiple cameras.
@@ -31,12 +32,10 @@ class MultipleVideoCapture:
 
     VideoCaptureBase = VideoCapture
     __caps = [None]
-    
+    __executor = ThreadPoolExecutor()
+
     def __init__(self, *indexes: Tuple[Union[int, str], ...]):
         self.open(*indexes)
-
-    def __del__(self):
-        return [cap.__del__() for cap in self]
 
     def __len__(self):
         return self.__caps.__len__()
@@ -54,43 +53,19 @@ class MultipleVideoCapture:
         for cap in self:
             if hasattr(cap, key):
                 setattr(cap, key, value)
-        
+
         return object.__setattr__(self, key, value)
+
+    def __getattr__(self, name):
+        def method(*args, **kwargs) -> List[Any]:
+            futures = [
+                self.__executor.submit(getattr(cap, name), *args, **kwargs)
+                for cap in self
+            ]
+            return [future.result() for future in futures]
+
+        return method
 
     def open(self, *indexs: Tuple[Union[int, str], ...]) -> List[bool]:
         self.__caps = [self.VideoCaptureBase(index) for index in indexs]
         return self.isOpened()
-
-    def isOpened(self) -> List[bool]:
-        return [cap.isOpened() for cap in self]
-
-    def grab(self) -> List[bool]:
-        return [cap.grab() for cap in self]
-
-    def retrieve(self) -> List[Tuple[bool, Union[np.ndarray, None]]]:
-        return [cap.retrieve() for cap in self]
-
-    def read(self) -> List[Tuple[bool, Union[np.ndarray, None]]]:
-        #return [cap.read() for cap in self]
-        executor = ThreadPoolExecutor()
-        futures = [executor.submit(cap.read) for cap in self]
-        executor.shutdown()
-        return [future.result() for future in futures]
-
-    def release(self) -> List[None]:
-        return self.__del__()
-
-    def set(self, propId: "cv2.VideoCaptureProperties", value: any) -> List[bool]:
-        return [cap.set(propId, value) for cap in self]
-    
-    def get(self, propId: "cv2.VideoCaptureProperties") -> List[any]:
-        return [cap.get(propId) for cap in self]
-
-    def setExceptionMode(self, enable: bool) -> List[None]:
-        return [cap.setExceptionMode(enable) for cap in self]
-
-    def set_pyspin_value(self, node_name: str, value: any) -> List[any]:
-        return [cap.set_pyspin_value(node_name, value) for cap in self]
-    
-    def get_pyspin_value(self, node_name: str) -> List[any]:
-        return [cap.get_pyspin_value(node_name) for cap in self]
