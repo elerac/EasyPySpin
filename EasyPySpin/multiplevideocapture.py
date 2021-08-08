@@ -8,13 +8,10 @@ from .videocapture import VideoCapture as EasyPySpinVideoCapture
 
 
 class MultipleVideoCapture:
-    """VideoCapture for Multiple cameras.
+    """VideoCapture for multiple cameras.
 
     Examples
     --------
-    >>> cap = MultipleVideoCapture(0)
-    >>> cap.isOpened()
-    [True]
     >>> cap = MultipleVideoCapture(0, 1)
     >>> cap.isOpened()
     [True, True]
@@ -28,6 +25,26 @@ class MultipleVideoCapture:
     [2000.0, 1000.0]
     >>> (ret0, frame0), (ret1, frame1) = cap.read()
     >>> cap.release()
+
+    Add camera after initialization
+
+    >>> cap = MultipleVideoCapture(0, 1)  # open two cameras
+    >>> cap.isOpened()
+    [True, True]
+    >>> cap.open(2)  # add a camera
+    >>> cap.isOpened()
+    [True, True, True]
+
+    Open camera as arbitrary VideoCapture
+
+    >>> cap = MultipleVideoCapture()
+    >>> cap.open(0, 1, VideoCapture=EasyPySpin.VideoCaptureEX)
+    >>> cap.isOpened()
+    [True, True]
+    >>> cap.average_num = 5  # Set attribute of VideoCaptureEX
+    >>> cap.open(0, VideoCapture=cv2.VideoCapture)
+    >>> cap.isOpened()
+    [True, True, True]
     """
 
     __caps = list()
