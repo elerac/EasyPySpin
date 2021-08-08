@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 import PySpin
 
-from .videocapture import VideoCapture
+from .videocapture import VideoCapture as EasyPySpinVideoCapture
 
 
 class MultipleVideoCapture:
@@ -30,8 +30,7 @@ class MultipleVideoCapture:
     >>> cap.release()
     """
 
-    VideoCaptureBase = VideoCapture
-    __caps = [None]
+    __caps = list()
     __executor = ThreadPoolExecutor()
 
     def __init__(self, *indexes: Tuple[Union[int, str], ...]):
@@ -66,6 +65,11 @@ class MultipleVideoCapture:
 
         return method
 
-    def open(self, *indexs: Tuple[Union[int, str], ...]) -> List[bool]:
-        self.__caps = [self.VideoCaptureBase(index) for index in indexs]
+    def open(
+        self, *indexs: Tuple[Union[int, str], ...], VideoCapture=EasyPySpinVideoCapture
+    ) -> List[bool]:
+        for index in indexs:
+            cap = VideoCapture(index)
+            self.__caps.append(cap)
+
         return self.isOpened()
