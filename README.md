@@ -11,7 +11,7 @@ EasyPySpin is an unofficial wrapper for FLIR [Spinnaker SDK](https://www.flir.co
 ```sh
 pip install git+https://github.com/elerac/EasyPySpin
 ```
-After installation, connect the camera and try `examples/video.py`.
+After installation, connect the camera and try [examples/video.py](examples/video.py).
 
 ## Usage
 ### Capture image from camera
@@ -58,20 +58,20 @@ cap.get_pyspin_value("DeviceModelName")
 Here is the list of supported VideoCaptureProperties. 
 In `set(propId, value)` and `get(propId)`, PySpin is used to set and get the camera's settings. The relationship between `propId` and PySpin settings is designed to be as close in meaning as possible. The table below shows the relationship between `propId` and PySpin settings in pseudo-code format.
 
-| propId                       | type  | set(propId, value) | value = get(propId) |
-| ----                         | ----  | ----        | ----        |
-| `cv2.CAP_PROP_FRAME_WIDTH`   | int   | `Width` = value | value = `Width` |
-| `cv2.CAP_PROP_FRAME_HEIGHT`  | int   | `Height` = value | value = `Height` |
-| `cv2.CAP_PROP_FPS`           | float | `AcquisitionFrameRateEnable` = `True` <br>  `AcquisitionFrameRate` = value | value = `ResultingFrameRate`| 
-| `cv2.CAP_PROP_BRIGHTNESS`    | float | `AutoExposureEVCompensation` = value | value = `AutoExposureEVCompensation` |
-| `cv2.CAP_PROP_GAIN`          | float | if value != -1 <br> &nbsp; `GainAuto` = `Off` <br> &nbsp; `Gain` = value <br> else <br> &nbsp; `GainAuto` = `Continuous` | value = `Gain` |
-| `cv2.CAP_PROP_EXPOSURE`      | float | if value != -1 <br> &nbsp; `ExposureAuto` = `Off` <br> &nbsp; `ExposureTime` = value <br> else <br> &nbsp; `ExposureAuto` = `Continuous` | value = `ExposureTime` |
-| `cv2.CAP_PROP_GAMMA`         | float | `GammaEnable` = `True` <br> `Gamma` = value | value = `Gamma` |
-| `cv2.CAP_PROP_TEMPERATURE`   | float | | value = `DeviceTemperature` |
-| `cv2.CAP_PROP_TRIGGER`       | bool  | if value == `True` <br> &nbsp; `TriggerMode` = `On` <br> else <br> &nbsp; `TriggerMode` = `Off` | if trigger_mode == `On` <br> &nbsp; value = `True` <br> elif trigger_mode == `Off` <br> &nbsp; value = `False` |
-| `cv2.CAP_PROP_TRIGGER_DELAY` | float | `TriggerDelay` = value | value = `TriggerDelay` | 
-| `cv2.CAP_PROP_BACKLIGHT`     | bool  | if value == `True` <br> &nbsp; `DeviceIndicatorMode` = `Active` <br> else <br> &nbsp; `DeviceIndicatorMode` = `Inactive` | if device_indicator_mode == `Active` <br> &nbsp; value = `True` <br> elif device_indicator_mode == `Inactive` <br> &nbsp; value = `False` |
-| `cv2.CAP_PROP_AUTO_WB`       | bool  | if value == `True` <br> &nbsp; `BalanceWhiteAuto` = `Continuous` <br> else <br> &nbsp; `BalanceWhiteAuto` = `Off` | if balance_white_auto == `Continuous` <br> &nbsp; value = `True` <br> elif balance_white_auto == `Off` <br> &nbsp; value = `False` |
+| propId                     | type  | set(propId, value) | value = get(propId) |
+| ----                       | ----  | ----        | ----        |
+| cv2.CAP_PROP_FRAME_WIDTH   | int   | `Width` = value | value = `Width` |
+| cv2.CAP_PROP_FRAME_HEIGHT  | int   | `Height` = value | value = `Height` |
+| cv2.CAP_PROP_FPS           | float | `AcquisitionFrameRateEnable` = `True` <br>  `AcquisitionFrameRate` = value | value = `ResultingFrameRate`| 
+| cv2.CAP_PROP_BRIGHTNESS    | float | `AutoExposureEVCompensation` = value | value = `AutoExposureEVCompensation` |
+| cv2.CAP_PROP_GAIN          | float | if value != -1 <br> &nbsp; `GainAuto` = `Off` <br> &nbsp; `Gain` = value <br> else <br> &nbsp; `GainAuto` = `Continuous` | value = `Gain` |
+| cv2.CAP_PROP_EXPOSURE      | float | if value != -1 <br> &nbsp; `ExposureAuto` = `Off` <br> &nbsp; `ExposureTime` = value <br> else <br> &nbsp; `ExposureAuto` = `Continuous` | value = `ExposureTime` |
+| cv2.CAP_PROP_GAMMA         | float | `GammaEnable` = `True` <br> `Gamma` = value | value = `Gamma` |
+| cv2.CAP_PROP_TEMPERATURE   | float | | value = `DeviceTemperature` |
+| cv2.CAP_PROP_TRIGGER       | bool  | if value == `True` <br> &nbsp; `TriggerMode` = `On` <br> else <br> &nbsp; `TriggerMode` = `Off` | if trigger_mode == `On` <br> &nbsp; value = `True` <br> elif trigger_mode == `Off` <br> &nbsp; value = `False` |
+| cv2.CAP_PROP_TRIGGER_DELAY | float | `TriggerDelay` = value | value = `TriggerDelay` | 
+| cv2.CAP_PROP_BACKLIGHT     | bool  | if value == `True` <br> &nbsp; `DeviceIndicatorMode` = `Active` <br> else <br> &nbsp; `DeviceIndicatorMode` = `Inactive` | if device_indicator_mode == `Active` <br> &nbsp; value = `True` <br> elif device_indicator_mode == `Inactive` <br> &nbsp; value = `False` |
+| cv2.CAP_PROP_AUTO_WB       | bool  | if value == `True` <br> &nbsp; `BalanceWhiteAuto` = `Continuous` <br> else <br> &nbsp; `BalanceWhiteAuto` = `Off` | if balance_white_auto == `Continuous` <br> &nbsp; value = `True` <br> elif balance_white_auto == `Off` <br> &nbsp; value = `False` |
 
 ## Command-Line Tool
 EasyPySpin provides a command-line tool. Connect the camera and execute the following commands, as shown below, then you can view the captured images.
