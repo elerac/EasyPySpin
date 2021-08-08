@@ -2,7 +2,6 @@ from typing import List, Tuple, Union, Any
 from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
-import PySpin
 
 from .videocapture import VideoCapture as EasyPySpinVideoCapture
 
