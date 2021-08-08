@@ -651,3 +651,85 @@ class VideoCapture:
         value = node.GetValue()
 
         return value
+
+    def _get_camera_series_name(self) -> str:
+        """Get camera series name"""
+        model_name = self.get_pyspin_value("DeviceModelName")
+
+        series_names = ["BFS", "BFLY", "CM3", "FL3", "GS3", "ORX", "FFY-DL"]
+        for name in series_names:
+            if name in model_name:
+                return name
+
+    def _configure_as_primary(self):
+        """Configure as primary camera for synchronized capture
+
+        Notes
+        -----
+        https://www.flir.com/support-center/iis/machine-vision/application-note/configuring-synchronized-capture-with-multiple-cameras/
+
+        4. Set the output line
+            1. For CM3, FL3, GS3, FFY-DL, and ORX cameras, select Line2 from the Line Selection dropdown and set Line Mode to Output.
+            2. For BFS cameras, select Line1 from the Line Selection dropdown and set Line Mode to Output.
+        5. For BFS and BFLY cameras enable the 3.3V line
+            1. For BFS cameras from the line selection drop-down select Line2 and check the checkbox for 3.3V Enable.
+            2. For BFLY cameras, set 3.3V Enable to true
+        """
+        series_name = self._get_camera_series_name()
+
+        # Set the output line
+        if series_name in ["CM3", "FL3", "GS3", "FFY-DL", "ORX"]:
+            # For CM3, FL3, GS3, FFY-DL, and ORX cameras,
+            # select Line2 from the Line Selection dropdown and set Line Mode to Output.
+            self.set_pyspin_value("LineSelector", "Line2")
+            self.set_pyspin_value("LineMode", "Output")
+        elif series_name in ["BFS"]:
+            # For BFS cameras, select Line1 from the Line Selection dropdown
+            # and set Line Mode to Output.
+            self.set_pyspin_value("LineSelector", "Line1")
+            self.set_pyspin_value("LineMode", "Output")
+
+        # For BFS and BFLY cameras enable the 3.3V line
+        if series_name in ["BFS"]:
+            # For BFS cameras from the line selection drop-down select Line2
+            # and check the checkbox for 3.3V Enable.
+            self.set_pyspin_value("LineSelector", "Line2")
+            self.set_pyspin_value("V3_3Enable", True)
+        elif series_name in ["BFLY"]:
+            # For BFLY cameras, set 3.3V Enable to true
+            self.set_pyspin_value("V3_3Enable", True)
+
+    def _configure_as_secondary(self):
+        """Configure as secondary camera for synchronized capture
+
+        Notes
+        -----
+        https://www.flir.com/support-center/iis/machine-vision/application-note/configuring-synchronized-capture-with-multiple-cameras/
+
+        2. Select the GPIO tab.
+            1. Set the trigger source
+            2. For BFS, CM3, FL3, FFY-DL, and GS3 cameras, from the Trigger Source drop-down, select Line 3.
+            3. For ORX cameras, from the Trigger Source drop-down, select Line 5.
+            4. For BFLY cameras, from the Trigger Source drop-down, select Line 0
+        3. From the Trigger Overlap drop-down, select Read Out.
+        4. From the Trigger Mode drop-down, select On.
+        """
+        series_name = self._get_camera_series_name()
+
+        self.set_pyspin_value("TriggerMode", "Off")
+        self.set_pyspin_value("TriggerSelector", "FrameStart")
+
+        # Set the trigger source
+        if series_name in ["BFS", "CM3", "FL3", "FFY-DL", "GS3"]:
+            # For BFS, CM3, FL3, FFY-DL, and GS3 cameras,
+            # from the Trigger Source drop-down, select Line 3.
+            self.set_pyspin_value("TriggerSource", "Line3")
+        elif series_name in ["ORX"]:
+            # For ORX cameras, from the Trigger Source drop-down, select Line 5.
+            self.set_pyspin_value("TriggerSource", "Line5")
+
+        # From the Trigger Overlap drop-down, select Read Out.
+        self.set_pyspin_value("TriggerOverlap", "ReadOut")
+
+        # From the Trigger Mode drop-down, select On.
+        self.set_pyspin_value("TriggerMode", "On")
