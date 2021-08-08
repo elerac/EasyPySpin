@@ -271,7 +271,7 @@ class VideoCaptureEX(VideoCapture):
             # Dummy image
             if i == 0:
                 for _ in range(3):
-                    self.grab()
+                    self.read()
 
             ret, frame = self.read()
 
