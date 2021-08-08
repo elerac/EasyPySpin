@@ -9,7 +9,7 @@ EasyPySpin is an unofficial wrapper for FLIR [Spinnaker SDK](https://www.flir.co
 
 ## Installation
 ```sh
-pip install git+https://github.com/elerac/EasyPySpin
+pip install EasyPySpin
 ```
 After installation, connect the camera and try [examples/video.py](examples/video.py).
 
