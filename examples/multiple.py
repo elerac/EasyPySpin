@@ -1,26 +1,35 @@
+"""Example of capture with multiple camera.
+"""
 import EasyPySpin
 import cv2
 
-NUM_IMAGES = 10
 
 def main():
-    cap0 = EasyPySpin.VideoCapture(0)
-    cap1 = EasyPySpin.VideoCapture(1)
-    
-    for n in range(NUM_IMAGES):
-        ret0, frame0 = cap0.read()
-        ret1, frame1 = cap1.read()
+    # cap = EasyPySpin.MultipleVideoCapture(0)
+    cap = EasyPySpin.MultipleVideoCapture(0, 1)
+    # cap = EasyPySpin.MultipleVideoCapture(0, 1, 2)
 
-        filename0 = "multiple-{0}-{1}.png".format(n, 0)
-        filename1 = "multiple-{0}-{1}.png".format(n, 1)
-        cv2.imwrite(filename0, frame0)
-        cv2.imwrite(filename1, frame1)
-        print("Image saved at {}".format(filename0))
-        print("Image saved at {}".format(filename1))
-        print()
+    if not all(cap.isOpened()):
+        print("All cameras can't open\nexit")
+        return -1
 
-    cap0.release()
-    cap1.release()
+    while True:
+        read_values = cap.read()
 
-if __name__=="__main__":
+        for i, (ret, frame) in enumerate(read_values):
+            if not ret:
+                continue
+
+            frame = cv2.resize(frame, None, fx=0.25, fy=0.25)
+            cv2.imshow(f"frame-{i}", frame)
+
+        key = cv2.waitKey(30)
+        if key == ord("q"):
+            break
+
+    cv2.destroyAllWindows()
+    cap.release()
+
+
+if __name__ == "__main__":
     main()
