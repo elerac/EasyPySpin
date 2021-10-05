@@ -62,7 +62,7 @@ In `set(propId, value)` and `get(propId)`, PySpin is used to set and get the cam
 | ----                       | ----  | ----        | ----        |
 | cv2.CAP_PROP_FRAME_WIDTH   | int   | `Width` = value | value = `Width` |
 | cv2.CAP_PROP_FRAME_HEIGHT  | int   | `Height` = value | value = `Height` |
-| cv2.CAP_PROP_FPS           | float | `AcquisitionFrameRateEnable` = `True` <br>  `AcquisitionFrameRate` = value | value = `ResultingFrameRate`| 
+| cv2.CAP_PROP_FPS           | float | `AcquisitionFrameRateEnable` = `True` <br>  `AcquisitionFrameRate` = value | value = `AcquisitionResultingFrameRate`| 
 | cv2.CAP_PROP_BRIGHTNESS    | float | `AutoExposureEVCompensation` = value | value = `AutoExposureEVCompensation` |
 | cv2.CAP_PROP_GAIN          | float | if value != -1 <br> &nbsp; `GainAuto` = `Off` <br> &nbsp; `Gain` = value <br> else <br> &nbsp; `GainAuto` = `Continuous` | value = `Gain` |
 | cv2.CAP_PROP_EXPOSURE      | float | if value != -1 <br> &nbsp; `ExposureAuto` = `Off` <br> &nbsp; `ExposureTime` = value <br> else <br> &nbsp; `ExposureAuto` = `Continuous` | value = `ExposureTime` |

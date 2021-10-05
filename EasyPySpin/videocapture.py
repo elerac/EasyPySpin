@@ -377,7 +377,7 @@ class VideoCapture:
         if propId == cv2.CAP_PROP_FPS:
             # If this does not equal the AcquisitionFrameRate
             # it is because the ExposureTime is greater than the frame time.
-            return self.get_pyspin_value("ResultingFrameRate")
+            return self.get_pyspin_value("AcquisitionResultingFrameRate")
 
         # Brightness
         if propId == cv2.CAP_PROP_BRIGHTNESS:

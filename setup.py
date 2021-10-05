@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="EasyPySpin",
-    version="2.0.0",
+    version="2.0.1",
     description="cv2.VideoCapture like wrapper for FLIR Spinnaker SDK",
     long_description=long_description,
     long_description_content_type="text/markdown",
